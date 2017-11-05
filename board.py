@@ -6,11 +6,13 @@ import Pyro4
 @Pyro4.behavior(instance_mode="single")
 class Board(object):
     def __init__(self):
-        self.board = ""
-        for j in range(height):
+        self.board = []
+	height = 20
+	width = 30
+        for j in range(20):
             string = '+'
-            for i in range(width):
-                if j != 0 and j != (height - 1):
+            for i in range(30):
+                if j != 0 and j != (20 - 1):
                     string += ' '
                 else:
                     string += '-'
