@@ -25,12 +25,37 @@ class Board(object):
     def writeBoard(self, newBoard):
         self.board = newBoard
 
+
+# def readShark(filename):
+#  +        with open(filename) as f:
+#  +                for line in f:
+#  +                        shark.append(line.split('\n')[0])
+          
+#  +def readFishy(filename):
+#  +  with open(filename) as f:
+#  +      for line in f:
+#  +          fish.append(line.split('\n')[0])
+#  +  
+#  +def drawBoard(height, width):
+#  +  for j in range(height):
+#  +      string = '+'
+#  +      for i in range(width):
+#  +          if j != 0 and j != (height - 1):
+#  +              string += ' '
+#  +          else:
+#  +              string += '-'
+#  +      string += '+'
+#  +      board.append(string
+
+
+
 def main():
     Pyro4.Daemon.serveSimple(
             {
                 Board: "example.board"
             },
-            ns = True)
+            ns = True,
+            host = '10.0.0.230')
 
 if __name__=="__main__":
     main()
