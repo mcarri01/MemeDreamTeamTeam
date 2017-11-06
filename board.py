@@ -30,7 +30,7 @@ def main():
             {
                 Board: "example.board"
             },
-            ns = False)
+            ns = True)
 
 if __name__=="__main__":
     main()

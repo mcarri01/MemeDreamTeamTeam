@@ -6,9 +6,8 @@ import Pyro4
 #import pyro
 
 def main(argv):
-	
-	uri = raw_input("Enter uri: ").strip()
-	board = Pyro4.Proxy(uri)
+
+	board = Pyro4.Proxy("PYRONAME:example.board")
 	b = board.readBoard()
 	for i in b:
 		print i
