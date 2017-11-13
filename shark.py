@@ -6,6 +6,8 @@ class Shark(object):
         self.shark = []
         self.col = startcol
         self.row = startrow
+        self.vertMove = .25
+        self.horizMove = 2
         with open(filename) as f:
             for line in f:
                 tmp = line.split('\n')[0]
@@ -16,16 +18,30 @@ class Shark(object):
         return self.shark
 
     def writeShark(self, board):
-        
-        tmprow = self.row
+        if self.row == 0:
+            if self.vertMove < 0:
+                self.row = board.getHeight() - 2
+            else:
+                self.row += 1
 
-        if tmprow == 0:
-            tmprow += 1
-        if tmprow >= (board.getHeight() - 1):
-            tmprow = 1
+        if self.row < 0:
+            self.row %= (board.getHeight() - 1)
+
+        tmprow = int(self.row)
 
         for line in self.shark:
-            tmpcol = self.col
+
+            if tmprow == 0:
+                tmprow += 1
+                continue
+            elif tmprow < 1:
+                tmprow += 1
+                continue
+            if tmprow >= board.getHeight() - 1:
+                tmprow = 1
+
+            tmpcol = int(self.col)
+
             for char in line:
                 if tmpcol > (board.getWidth() - 1):
                     tmpcol += 1
@@ -38,21 +54,52 @@ class Shark(object):
                     tmpcol += 1
 
                 board.writeBoard(char, tmprow, tmpcol)
-                
                 tmpcol += 1
-
             tmprow += 1
-            if tmprow == 0:
-                tmprow += 1
-            if tmprow >= (board.getHeight() - 1):
-                tmprow = 1
+
+
+
+
+
+        #MAYBE THIS WILL WORK ONE DAY        
+        # tmprow = self.row
+
+        # if tmprow == 0:
+        #     tmprow += 1
+        # if tmprow >= (board.getHeight() - 1):
+        #     tmprow = 1
+
+        # for line in self.shark:
+        #     tmpcol = self.col
+
+        #     if tmprow == 0:
+        #         tmprow += 1
+        #     if tmprow >= (board.getHeight() - 1):
+        #         tmprow = 1
+
+        #     for char in line:
+        #         if tmpcol > (board.getWidth() - 1):
+        #             tmpcol += 1
+        #             continue
+        #         elif tmpcol < 0:
+        #             tmpcol += 1
+        #             continue
+
+        #         if tmpcol == 0:
+        #             tmpcol += 1
+
+        #         board.writeBoard(char, tmprow, tmpcol)
+                
+        #         tmpcol += 1
+
+        #     tmprow += 1
 
     def move(self, board):
-        self.col += 0
-        self.row += 1
+        self.col += self.horizMove
+        self.row += self.vertMove
 
-        self.col %= board.getWidth()
-        self.row %= board.getHeight()
+        # self.col %= (board.getWidth() - 1)
+        self.row %= (board.getHeight() - 1)
 
         # if self.row < 1:
         #     self.row = board.getHeight() - 2;

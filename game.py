@@ -9,7 +9,7 @@ import time
 
 def main(argv):
 	os.system('cls' if os.name == 'nt' else 'clear')
-	NS = Pyro4.locateNS(host="192.168.1.16", port=9090, broadcast=True)
+	NS = Pyro4.locateNS(host="10.245.164.240", port=9090, broadcast=True)
 
 	uri = NS.lookup("example.board")
 
@@ -19,7 +19,7 @@ def main(argv):
 
 	b = board.readBoard()
 
-	s = Shark("shark.txt", -5, 1)
+	s = Shark("shark.txt", -5, -60)
 
 	s.writeShark(board)
 
