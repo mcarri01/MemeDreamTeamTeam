@@ -2,25 +2,53 @@ import os
 import sys
 
 class Shark(object):
-    def __init__(self, filename, startcol, startrow):
+    def __init__(self, filename, startrow, startcol):
         self.shark = []
         self.col = startcol
         self.row = startrow
         with open(filename) as f:
             for line in f:
-                self.shark.append(line.split('\n')[0])
+                tmp = line.split('\n')[0]
+                tmp = list(tmp.encode("ascii"))
+                self.shark.append(tmp)
 
     def readShark(self):
         return self.shark
 
     def writeShark(self, board):
-        tmpcol = self.col
         tmprow = self.row
         for line in self.shark:
+            tmpcol = self.col
             for char in line:
-                board.writeBoard(char, tmpcol, tmprow)
+                # if tmprow >= (board.getHeight() - 1):
+                #     tmprow = 1
+                if tmpcol > (board.getWidth() - 1):
+                    tmpcol += 1
+                    continue
+                elif tmpcol < 0:
+                    tmpcol += 1
+                    continue
+
+                if tmpcol == 0:
+                    tmpcol += 1
+
+                board.writeBoard(char, tmprow, tmpcol)
+                
                 tmpcol += 1
+
             tmprow += 1
+            if tmprow == 0:
+                tmprow += 1
+
+    def move(self, board):
+        self.col += 0
+        self.row += 1
+
+        # if self.row < 1:
+        #     self.row = board.getHeight() - 2;
+        # elif self.row >= (board.getHeight() - 1):
+        #     self.row = 1
+
 
 
 # def readShark(filename):

@@ -7,23 +7,37 @@ import Pyro4
 class Board(object):
     def __init__(self):
         self.board = []
-        height = 20
-        width = 30
-        for j in range(30):
-            string = '+'
-            for i in range(130):
-                if j != 0 and j != (30 - 1):
-                    string += ' '
+        self.height = 30
+        self.width = 130
+        for j in range(self.height):
+            string = ['+']
+            for i in range(self.width-1):
+                if j != 0 and j != (self.height - 1):
+                    string.append(' ')
                 else:
-                    string += '-'
-            string += '+'
+                    string.append('-')
+            string.append('+')
             self.board.append(string)
+
+    def clearBoard(self):
+        for i in range(1, self.height - 1):
+            for j in range(1, self.width):
+                self.board[i][j] = ' '
 
     def readBoard(self):
         return self.board
 
-    def writeBoard(self, c, col, row):
+    def writeBoard(self, c, row, col):
         self.board[row][col] = c
+
+    def getHeight(self):
+        return self.height
+
+    def getWidth(self):
+        return self.width
+
+#        self.board[row][col] = c
+
 
 
 # def readShark(filename):

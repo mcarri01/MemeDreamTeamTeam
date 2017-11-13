@@ -3,30 +3,40 @@ import os
 import threading
 import Pyro4
 from shark import *
+import time
 # for networking
 #import pyro
 
 def main(argv):
-#	board = Pyro4.Proxy("PYRONAME:example.board@10.0.0.230:8080")
+	os.system('cls' if os.name == 'nt' else 'clear')
 	NS = Pyro4.locateNS(host="10.0.0.185", port=9090, broadcast=True)
-	#uri = "PYRO:Pyro.NameServer@10.0.0.230:9090"
+
 	uri = NS.lookup("example.board")
+
 	board = Pyro4.Proxy(uri)
-	# print NS
-	# board = NS.lookup("example.board@10.0.0.230")
+
+	b = board.clearBoard()
+
 	b = board.readBoard()
-	for i in b:
-		print i
 
-	s = Shark("shark.txt", 100, 5)
-
-	shark = s.readShark()
+	s = Shark("shark.txt", -5, 1)
 
 	s.writeShark(board)
 
-	for i in b:
-		print i
+	b = board.readBoard()
 
+	while True:		
+		for i in b:
+			for j in i:
+				sys.stdout.write(j)
+			print ''
+
+		b = board.clearBoard()
+		s.move(board)
+		s.writeShark(board)
+		b = board.readBoard()
+
+		os.system('cls' if os.name == 'nt' else 'clear')
 
 	
 	
