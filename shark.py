@@ -16,12 +16,17 @@ class Shark(object):
         return self.shark
 
     def writeShark(self, board):
+        
         tmprow = self.row
+
+        if tmprow == 0:
+            tmprow += 1
+        if tmprow >= (board.getHeight() - 1):
+            tmprow = 1
+
         for line in self.shark:
             tmpcol = self.col
             for char in line:
-                # if tmprow >= (board.getHeight() - 1):
-                #     tmprow = 1
                 if tmpcol > (board.getWidth() - 1):
                     tmpcol += 1
                     continue
@@ -39,10 +44,15 @@ class Shark(object):
             tmprow += 1
             if tmprow == 0:
                 tmprow += 1
+            if tmprow >= (board.getHeight() - 1):
+                tmprow = 1
 
     def move(self, board):
         self.col += 0
         self.row += 1
+
+        self.col %= board.getWidth()
+        self.row %= board.getHeight()
 
         # if self.row < 1:
         #     self.row = board.getHeight() - 2;

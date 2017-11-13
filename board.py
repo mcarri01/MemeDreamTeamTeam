@@ -69,7 +69,7 @@ def main():
                 Board: "example.board"
             },
             ns = True,
-            host = '10.0.0.185')
+            host = '192.168.1.16')
 
 if __name__=="__main__":
     main()
