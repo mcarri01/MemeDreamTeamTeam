@@ -7,7 +7,7 @@ class Shark(object):
         self.col = startcol
         self.row = startrow
         self.vertMove = .25
-        self.horizMove = 2
+        self.horizMove = .5
         with open(filename) as f:
             for line in f:
                 tmp = line.split('\n')[0]
@@ -52,47 +52,10 @@ class Shark(object):
 
                 if tmpcol == 0:
                     tmpcol += 1
-
-                board.writeBoard(char, tmprow, tmpcol)
+		if char != ' ':
+                	board.writeBoard(char, tmprow, tmpcol)
                 tmpcol += 1
             tmprow += 1
-
-
-
-
-
-        #MAYBE THIS WILL WORK ONE DAY        
-        # tmprow = self.row
-
-        # if tmprow == 0:
-        #     tmprow += 1
-        # if tmprow >= (board.getHeight() - 1):
-        #     tmprow = 1
-
-        # for line in self.shark:
-        #     tmpcol = self.col
-
-        #     if tmprow == 0:
-        #         tmprow += 1
-        #     if tmprow >= (board.getHeight() - 1):
-        #         tmprow = 1
-
-        #     for char in line:
-        #         if tmpcol > (board.getWidth() - 1):
-        #             tmpcol += 1
-        #             continue
-        #         elif tmpcol < 0:
-        #             tmpcol += 1
-        #             continue
-
-        #         if tmpcol == 0:
-        #             tmpcol += 1
-
-        #         board.writeBoard(char, tmprow, tmpcol)
-                
-        #         tmpcol += 1
-
-        #     tmprow += 1
 
     def move(self, board):
         self.col += self.horizMove
@@ -106,7 +69,11 @@ class Shark(object):
         # elif self.row >= (board.getHeight() - 1):
         #     self.row = 1
 
+    def getCol(self):
+	return self.col
 
+    def getRow(self):
+        return self.row
 
 # def readShark(filename):
 #  +        with open(filename) as f:
