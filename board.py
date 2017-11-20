@@ -30,7 +30,7 @@ class Board(object):
 
     def writeBoard(self, row, col, vertMove, horizMove, height, width, shark):
         if col > self.width + 1:
-            return True
+            return self.board, True
         if row == 0:
             if vertMove < 0:
                 row = self.height - 2

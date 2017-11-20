@@ -12,6 +12,8 @@ import signal
 serverLock = threading.Semaphore(0)
 boardLock = threading.Semaphore(0)
 processes = []
+dinnerBell = False
+board = ''
 
 def startBoard(IP):
 	serverLock.acquire()
@@ -22,32 +24,28 @@ def startServer(IP):
 	processes.append(subprocess.Popen("pyro4-ns -n %s > /dev/null" % IP, shell=True, preexec_fn=os.setsid))
 	serverLock.release()
 
-def main(argv):
-	print(chr(27) + "[2J")
-	print(chr(27) + "[H")
+def testRead():
+	while not dinnerBell:
+		boardLock.acquire()
 
-	threads = []
-	IP = subprocess.check_output("ifconfig |grep inet\ ", shell=True).split(' ')[5]
-	threads.append(threading.Thread(target = startServer, args = [IP]))
-	threads.append(threading.Thread(target = startBoard, args = [IP]))
+		print(chr(27) + "[2J")
+		print(chr(27) + "[H")
 
-	for thread in threads:
-		thread.start()
+		global board
+		b = board.readBoard()
+		for i in b:
+			for j in i:
+				sys.stdout.write(j)
+			print ''
+		boardLock.release()
+		time.sleep(1.0/25)
+
+def swimShark(startRow, startCol):
+	s = Shark("shark.txt", startRow, startCol)
 
 	boardLock.acquire()
-
-	NS = Pyro4.locateNS(host=IP, port=9090, broadcast=True)
-
-	uri = NS.lookup("example.board")
-
-	board = Pyro4.Proxy(uri)
-
-	board.clearBoard()
-
-	s = Shark("shark.txt", -5, -60)
-	board.writeBoard(s.row, s.col, s.vertMove, s.horizMove, 9, 55, s.shark)
-
-	b = board.readBoard()
+	offScreen = board.writeBoard(s.row, s.col, s.vertMove, s.horizMove, 9, 55, s.shark)
+	boardLock.release()
 
 	prevCol = 0
 	prevRow = 0
@@ -55,40 +53,76 @@ def main(argv):
 	lastTime = datetime.now()
 	counter = 0
 
-	offScreen = False
-
 	while not offScreen:
-		currTime = datetime.now()
-		delta = currTime - lastTime
-		lastTime = currTime
+		# currTime = datetime.now()
+		# delta = currTime - lastTime
+		# lastTime = currTime
 
-		counter += delta.microseconds
-		if counter >= 1000000/24:
-			counter = 0
+		# counter += delta.microseconds
+		# if counter >= 1000000/24:
+		# 	counter = 0
 			
-			if int(prevCol) == int(s.getCol()) and int(prevRow) == int(s.getRow()):
-				prevCol = s.getCol()
-				prevRow = s.getRow()
-				s.move(board)
-				continue
-
-			print(chr(27) + "[2J")
-			print(chr(27) + "[H")
-
-			for i in b:
-				for j in i:
-					sys.stdout.write(j)
-				print ''
-
-			board.clearBoard()
-			
+		if int(prevCol) == int(s.getCol()) and int(prevRow) == int(s.getRow()):
 			prevCol = s.getCol()
 			prevRow = s.getRow()
-			
 			s.move(board)
+			continue
 
-			offScreen = board.writeBoard(s.row, s.col, s.vertMove, s.horizMove, 9, 55, s.shark)
-			b = board.readBoard()
+		boardLock.acquire()
+		offScreen = board.writeBoard(s.row, s.col, s.vertMove, s.horizMove, 9, 55, s.shark)
+		boardLock.release()
+
+		boardLock.acquire()
+		board.clearBoard()
+		boardLock.release()
+		
+		prevCol = s.getCol()
+		prevRow = s.getRow()
+		
+		s.move(board)
+
+	global dinnerBell
+	dinnerBell = True
+
+			
+
+def main(argv):
+	print(chr(27) + "[2J")
+	print(chr(27) + "[H")
+
+	processesStart = []
+	IP = subprocess.check_output("ifconfig |grep inet\ ", shell=True).split(' ')[5]
+	processesStart.append(threading.Thread(target = startServer, args = [IP]))
+	processesStart.append(threading.Thread(target = startBoard, args = [IP]))
+
+	for p in processesStart:
+		p.start()
+
+	boardLock.acquire()
+	boardLock.release()
+
+	NS = Pyro4.locateNS(host=IP, port=9090, broadcast=True)
+
+	uri = NS.lookup("example.board")
+
+	global board
+	board = Pyro4.Proxy(uri)
+
+	# Doesn't need to be locked, because threads being created and started
+	# will be sequentially afterwards
+	# board.clearBoard()
+
+	threads = []
+
+	threads.append(threading.Thread(target=swimShark, args=[-5, -60]))
+	threads.append(threading.Thread(target=testRead))
+	#threads.append(threading.Thread(target=swimShark, args=[0,0]))
+
+	for thread in threads:
+		thread.start()
+
+	for thread in threads:
+		thread.join()
 
 	for process in processes:
 		os.killpg(os.getpgid(process.pid), signal.SIGTERM)

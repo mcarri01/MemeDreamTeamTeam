@@ -7,7 +7,7 @@ class Shark(object):
         self.col = startcol
         self.row = startrow
         self.vertMove = .25
-        self.horizMove = .25
+        self.horizMove = 1
         with open(filename) as f:
             for line in f:
                 tmp = line.split('\n')[0]
