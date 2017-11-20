@@ -5,12 +5,38 @@ import Pyro4
 from shark import *
 import time
 from datetime import datetime
-# for networking
-#import pyro
+import subprocess
+import multiprocessing as mp
+import signal
+
+serverLock = threading.Semaphore(0)
+boardLock = threading.Semaphore(0)
+processes = []
+
+def startBoard(IP):
+	serverLock.acquire()
+	processes.append(subprocess.Popen("python board.py %s > /dev/null" % IP, shell=True, preexec_fn=os.setsid))
+	boardLock.release()
+
+def startServer(IP):
+	processes.append(subprocess.Popen("pyro4-ns -n %s > /dev/null" % IP, shell=True, preexec_fn=os.setsid))
+	serverLock.release()
 
 def main(argv):
-	os.system('cls' if os.name == 'nt' else 'clear')
-	NS = Pyro4.locateNS(host="10.0.0.185", port=9090, broadcast=True)
+	print(chr(27) + "[2J")
+	print(chr(27) + "[H")
+
+	threads = []
+	IP = subprocess.check_output("ifconfig |grep inet\ ", shell=True).split(' ')[5]
+	threads.append(threading.Thread(target = startServer, args = [IP]))
+	threads.append(threading.Thread(target = startBoard, args = [IP]))
+
+	for thread in threads:
+		thread.start()
+
+	boardLock.acquire()
+
+	NS = Pyro4.locateNS(host=IP, port=9090, broadcast=True)
 
 	uri = NS.lookup("example.board")
 
@@ -29,14 +55,15 @@ def main(argv):
 	lastTime = datetime.now()
 	counter = 0
 
-	while True:
+	offScreen = False
+
+	while not offScreen:
 		currTime = datetime.now()
 		delta = currTime - lastTime
 		lastTime = currTime
 
 		counter += delta.microseconds
 		if counter >= 1000000/24:
-		# os.system('cls' if os.name == 'nt' else 'clear')
 			counter = 0
 			
 			if int(prevCol) == int(s.getCol()) and int(prevRow) == int(s.getRow()):
@@ -57,15 +84,14 @@ def main(argv):
 			
 			prevCol = s.getCol()
 			prevRow = s.getRow()
-
-			#seconds = 1.0/40
-			#time.sleep(seconds)
 			
 			s.move(board)
 
-			board.writeBoard(s.row, s.col, s.vertMove, s.horizMove, 9, 55, s.shark)
+			offScreen = board.writeBoard(s.row, s.col, s.vertMove, s.horizMove, 9, 55, s.shark)
 			b = board.readBoard()
 
+	for process in processes:
+		os.killpg(os.getpgid(process.pid), signal.SIGTERM)
 
 	
 	

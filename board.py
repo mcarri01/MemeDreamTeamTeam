@@ -1,5 +1,6 @@
 from __future__ import print_function
 import Pyro4
+import sys
 
 
 @Pyro4.expose
@@ -28,6 +29,8 @@ class Board(object):
         return self.board
 
     def writeBoard(self, row, col, vertMove, horizMove, height, width, shark):
+        if col > self.width + 1:
+            return True
         if row == 0:
             if vertMove < 0:
                 row = self.height - 2
@@ -65,6 +68,7 @@ class Board(object):
                     self.board[tmprow][tmpcol] = c
                 tmpcol += 1
             tmprow += 1
+        return False
 
     def getHeight(self):
         return self.height
@@ -72,40 +76,15 @@ class Board(object):
     def getWidth(self):
         return self.width
 
-#        self.board[row][col] = c
 
 
-
-# def readShark(filename):
-#  +        with open(filename) as f:
-#  +                for line in f:
-#  +                        shark.append(line.split('\n')[0])
-          
-#  +def readFishy(filename):
-#  +  with open(filename) as f:
-#  +      for line in f:
-#  +          fish.append(line.split('\n')[0])
-#  +  
-#  +def drawBoard(height, width):
-#  +  for j in range(height):
-#  +      string = '+'
-#  +      for i in range(width):
-#  +          if j != 0 and j != (height - 1):
-#  +              string += ' '
-#  +          else:
-#  +              string += '-'
-#  +      string += '+'
-#  +      board.append(string
-
-
-
-def main():
+def main(args):
     Pyro4.Daemon.serveSimple(
             {
                 Board: "example.board"
             },
             ns = True,
-            host = '10.0.0.185')
+            host = args[1])
 
 if __name__=="__main__":
-    main()
+    main(sys.argv)

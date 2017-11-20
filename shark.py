@@ -15,10 +15,7 @@ class Shark(object):
                 self.shark.append(tmp)
 
     def readShark(self):
-        return self.shark
-
-    #def writeShark(self, board):
-        
+        return self.shark        
 
     def move(self, board):
         self.col += self.horizMove
