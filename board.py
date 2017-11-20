@@ -27,8 +27,44 @@ class Board(object):
     def readBoard(self):
         return self.board
 
-    def writeBoard(self, c, row, col):
-        self.board[row][col] = c
+    def writeBoard(self, row, col, vertMove, horizMove, height, width, shark):
+        if row == 0:
+            if vertMove < 0:
+                row = self.height - 2
+            else:
+                row += 1
+        if row < 0:
+            row %= (self.height - 1)
+
+        tmprow = int(row)
+
+        for line in shark:
+
+            if tmprow == 0:
+                tmprow += 1
+                continue
+            elif tmprow < 1:
+                tmprow += 1
+                continue
+            if tmprow >= self.height - 1:
+                tmprow = 1
+
+            tmpcol = int(col)
+
+            for c in line:
+                if tmpcol > (self.width - 1):
+                    tmpcol += 1
+                    continue
+                elif tmpcol < 0:
+                    tmpcol += 1
+                    continue
+
+                if tmpcol == 0:
+                    tmpcol += 1
+                if c != ' ':
+                    self.board[tmprow][tmpcol] = c
+                tmpcol += 1
+            tmprow += 1
 
     def getHeight(self):
         return self.height
@@ -69,7 +105,7 @@ def main():
                 Board: "example.board"
             },
             ns = True,
-            host = '192.168.0.71')
+            host = '10.0.0.185')
 
 if __name__=="__main__":
     main()

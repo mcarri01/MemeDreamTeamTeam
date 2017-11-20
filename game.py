@@ -4,12 +4,13 @@ import threading
 import Pyro4
 from shark import *
 import time
+from datetime import datetime
 # for networking
 #import pyro
 
 def main(argv):
 	os.system('cls' if os.name == 'nt' else 'clear')
-	NS = Pyro4.locateNS(host="192.168.0.71", port=9090, broadcast=True)
+	NS = Pyro4.locateNS(host="10.0.0.185", port=9090, broadcast=True)
 
 	uri = NS.lookup("example.board")
 
@@ -17,45 +18,54 @@ def main(argv):
 
 	board.clearBoard()
 
-	#b = board.readBoard()
-
 	s = Shark("shark.txt", -5, -60)
-
-	s.writeShark(board)
+	board.writeBoard(s.row, s.col, s.vertMove, s.horizMove, 9, 55, s.shark)
 
 	b = board.readBoard()
-	k = 0
 
 	prevCol = 0
 	prevRow = 0
 
+	lastTime = datetime.now()
+	counter = 0
+
 	while True:
-		if int(prevCol) == int(s.getCol()) and int(prevRow) == int(s.getRow()):
+		currTime = datetime.now()
+		delta = currTime - lastTime
+		lastTime = currTime
+
+		counter += delta.microseconds
+		if counter >= 1000000/24:
+		# os.system('cls' if os.name == 'nt' else 'clear')
+			counter = 0
+			
+			if int(prevCol) == int(s.getCol()) and int(prevRow) == int(s.getRow()):
+				prevCol = s.getCol()
+				prevRow = s.getRow()
+				s.move(board)
+				continue
+
+			print(chr(27) + "[2J")
+			print(chr(27) + "[H")
+
+			for i in b:
+				for j in i:
+					sys.stdout.write(j)
+				print ''
+
+			board.clearBoard()
+			
 			prevCol = s.getCol()
-                	prevRow = s.getRow()
+			prevRow = s.getRow()
+
+			#seconds = 1.0/40
+			#time.sleep(seconds)
 			
 			s.move(board)
-			k+=1
-			print k
-			continue
-		for i in b:
-			for j in i:
-				sys.stdout.write(j)
-			print ''
 
-		board.clearBoard()
-		
-		prevCol = s.getCol()
-		prevRow = s.getRow()
-		
-		s.move(board)
-		
+			board.writeBoard(s.row, s.col, s.vertMove, s.horizMove, 9, 55, s.shark)
+			b = board.readBoard()
 
-		s.writeShark(board)
-		b = board.readBoard()
-		k += 1
-		print k
-		#os.system('cls' if os.name == 'nt' else 'clear')
 
 	
 	
