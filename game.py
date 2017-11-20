@@ -8,6 +8,7 @@ from datetime import datetime
 import subprocess
 import multiprocessing as mp
 import signal
+import socket
 
 serverLock = threading.Semaphore(0)
 boardLock = threading.Semaphore(0)
@@ -31,7 +32,7 @@ def testRead():
 		print(chr(27) + "[2J")
 		print(chr(27) + "[H")
 
-		global board
+		global boardp
 		b = board.readBoard()
 		for i in b:
 			for j in i:
@@ -91,7 +92,12 @@ def main(argv):
 	print(chr(27) + "[H")
 
 	processesStart = []
-	IP = subprocess.check_output("ifconfig |grep inet\ ", shell=True).split(' ')[5]
+	#IP = subprocess.check_output("ifconfig |grep inet\ ", shell=True).split(' ')[5]
+	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	s.connect(("8.8.8.8", 80))
+	IP = s.getsockname()[0]
+	s.close()
+
 	processesStart.append(threading.Thread(target = startServer, args = [IP]))
 	processesStart.append(threading.Thread(target = startBoard, args = [IP]))
 
