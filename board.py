@@ -2,7 +2,6 @@ from __future__ import print_function
 import Pyro4
 import sys
 
-
 @Pyro4.expose
 @Pyro4.behavior(instance_mode="single")
 class Board(object):
@@ -24,12 +23,12 @@ class Board(object):
         for i in range(1, self.height - 1):
             for j in range(1, self.width):
                 self.board[i][j] = ' '
-
+        
     def readBoard(self):
         return self.board
-
-    def writeBoard(self, row, col, vertMove, horizMove, height, width, shark):
-        if col > self.width + 1:
+        
+    def writeBoardShark(self, row, col, vertMove, horizMove, height, width, shark):
+        if col > self.width + 1:    
             return self.board, True
         if row == 0:
             if vertMove < 0:
@@ -68,8 +67,18 @@ class Board(object):
                     self.board[tmprow][tmpcol] = c
                 tmpcol += 1
             tmprow += 1
+        
         return False
 
+    def writeBoardFish(self, row, col, fish):
+        tmprow = int(row)
+        for line in fish:
+            tmpcol = int(col)
+            for c in line:
+                self.board[tmprow][tmpcol] = c
+                tmpcol += 1
+            tmprow += 1
+        
     def getHeight(self):
         return self.height
 
@@ -77,8 +86,8 @@ class Board(object):
         return self.width
 
 
-
 def main(args):
+    Pyro4.config.SERVERTYPE = "multiplex"
     Pyro4.Daemon.serveSimple(
             {
                 Board: "example.board"

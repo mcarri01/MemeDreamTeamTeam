@@ -27,26 +27,22 @@ def startServer(IP):
 
 def testRead():
 	while not dinnerBell:
-		boardLock.acquire()
 
 		print(chr(27) + "[2J")
 		print(chr(27) + "[H")
 
-		global boardp
+		global board
 		b = board.readBoard()
 		for i in b:
 			for j in i:
 				sys.stdout.write(j)
 			print ''
-		boardLock.release()
 		time.sleep(1.0/25)
 
 def swimShark(startRow, startCol):
 	s = Shark("shark.txt", startRow, startCol)
 
-	boardLock.acquire()
-	offScreen = board.writeBoard(s.row, s.col, s.vertMove, s.horizMove, 9, 55, s.shark)
-	boardLock.release()
+	offScreen = board.writeBoardShark(s.row, s.col, s.vertMove, s.horizMove, 9, 55, s.shark)
 
 	prevCol = 0
 	prevRow = 0
@@ -69,13 +65,9 @@ def swimShark(startRow, startCol):
 			s.move(board)
 			continue
 
-		boardLock.acquire()
-		offScreen = board.writeBoard(s.row, s.col, s.vertMove, s.horizMove, 9, 55, s.shark)
-		boardLock.release()
+		offScreen = board.writeBoardShark(s.row, s.col, s.vertMove, s.horizMove, 9, 55, s.shark)
 
-		boardLock.acquire()
 		board.clearBoard()
-		boardLock.release()
 		
 		prevCol = s.getCol()
 		prevRow = s.getRow()
@@ -84,8 +76,6 @@ def swimShark(startRow, startCol):
 
 	global dinnerBell
 	dinnerBell = True
-
-			
 
 def main(argv):
 	print(chr(27) + "[2J")
@@ -120,7 +110,8 @@ def main(argv):
 
 	threads = []
 
-	threads.append(threading.Thread(target=swimShark, args=[-5, -60]))
+	swimShark(-5, -60)
+	#threads.append(threading.Thread(target=swimShark, args=[-5, -60]))
 	threads.append(threading.Thread(target=testRead))
 	#threads.append(threading.Thread(target=swimShark, args=[0,0]))
 
@@ -133,7 +124,6 @@ def main(argv):
 	for process in processes:
 		os.killpg(os.getpgid(process.pid), signal.SIGTERM)
 
-	
-	
+
 if __name__ == "__main__":
 	main(sys.argv)
