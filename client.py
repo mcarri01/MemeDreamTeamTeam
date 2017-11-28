@@ -7,10 +7,14 @@ import Pyro4
 import socket
 import time
 import random
+from datetime import datetime
+import curses
+from curses import wrapper
+import signal
+
 
 board = ''
 notDead = True
-
 
 def initializeGame():
 	print(chr(27) + "[2J")
@@ -31,48 +35,64 @@ def initializeGame():
 	global board
 	board = Pyro4.Proxy(uri)
 
-def retrieveDisplay():
+def retrieveDisplay(stdscr):
+	lastTime = datetime.now()
+	counter = 0
 	while True:
-		print(chr(27) + "[2J")
-		print(chr(27) + "[H")
+		currTime = datetime.now()
+		delta = currTime - lastTime
+		lastTime = currTime
+		counter += delta.microseconds
+		if counter >= 1000000/10:
+			counter = 0
 
-		global board
-		b = board.readBoard()
-		for i in b:
-			for j in i:
-				sys.stdout.write(j)
-			print ''
-		time.sleep(1.0/100)
+			global board
+			b = board.readBoard()
+			string = ''
+			for line in b:
+				for c in line:
+					string += c
+				string += '\n'
+			stdscr.addstr(string)
+			stdscr.move(0, 0)			
+			board.clearBoard()
 
-def controlFish():
-	getch = Getch()
-	initCol = random.randint(80, 129)
-	initRow = random.randint(15, 20)
+def controlFish(stdscr):
+	initCol = random.randint(1, 8)
+	initRow = random.randint(1, 5)
 	fish = Fish("fish.txt", initRow, initCol)
 	while notDead:
-		key = 'b'
-		#key = getch()
+		key = stdscr.getch()
+		curses.flushinp
 		currCol = fish.getCol()
 		currRow = fish.getRow()
-		if key == 'w':
+		if key == ord('w'):
 			fish.setRow(currRow - 1)
-		elif key == 'd':
+		elif key == ord('d'):
 			fish.setCol(currCol + 1)
-		elif key == 's':
+		elif key == ord('s'):
 			fish.setRow(currRow + 1)
-		elif key == 'a':
+		elif key == ord('a'):
 			fish.setCol(currCol - 1)
 		# global board
 		board.writeBoardFish(fish.getRow(), fish.getCol(), fish.getFish())
-		board.clearBoard()
 
-def main(args):
+def main(stdscr, args):
 	initializeGame()
-	displayThread = threading.Thread(target=retrieveDisplay, args=[])
-	fishThread = threading.Thread(target=controlFish, args=[])
+
+	stdscr.nodelay(True)
+	stdscr.clear()
+
+	displayThread = threading.Thread(target=retrieveDisplay, args=[stdscr])
+	fishThread = threading.Thread(target=controlFish, args=[stdscr])
+	displayThread.setDaemon(True)
+	fishThread.setDaemon(True)
 
 	displayThread.start()
 	fishThread.start()
 
+	displayThread.join()
+	fishThread.join()
+
 if __name__ == "__main__":
-	main(sys.argv)
+	wrapper(main, sys.argv)

@@ -8,7 +8,7 @@ class Board(object):
     def __init__(self):
         self.board = []
         self.height = 30
-        self.width = 130
+        self.width = 100
         for j in range(self.height):
             string = ['+']
             for i in range(self.width-1):
