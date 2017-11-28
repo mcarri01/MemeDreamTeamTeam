@@ -22,7 +22,7 @@ def startBoard(IP):
 	boardLock.release()
 
 def startServer(IP):
-	processes.append(subprocess.Popen("pyro4-ns -n %s > /dev/null" % IP, shell=True, preexec_fn=os.setsid))
+	processes.append(subprocess.Popen("python -m Pyro4.naming -n %s > /dev/null" % IP, shell=True, preexec_fn=os.setsid))
 	serverLock.release()
 
 def testRead():
@@ -37,7 +37,7 @@ def testRead():
 			for j in i:
 				sys.stdout.write(j)
 			print ''
-		time.sleep(1.0/25)
+		time.sleep(1.0/100)
 
 def swimShark(startRow, startCol):
 	s = Shark("shark.txt", startRow, startCol)
@@ -87,7 +87,7 @@ def main(argv):
 	s.connect(("8.8.8.8", 80))
 	IP = s.getsockname()[0]
 	s.close()
-
+	print IP
 	processesStart.append(threading.Thread(target = startServer, args = [IP]))
 	processesStart.append(threading.Thread(target = startBoard, args = [IP]))
 
@@ -111,7 +111,7 @@ def main(argv):
 	threads = []
 
 	swimShark(-5, -60)
-	#threads.append(threading.Thread(target=swimShark, args=[-5, -60]))
+	threads.append(threading.Thread(target=swimShark, args=[-5, -60]))
 	threads.append(threading.Thread(target=testRead))
 	#threads.append(threading.Thread(target=swimShark, args=[0,0]))
 

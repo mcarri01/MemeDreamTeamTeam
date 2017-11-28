@@ -2,6 +2,7 @@ import sys
 import os
 import threading
 from fish import *
+from getch import *
 import Pyro4
 import socket
 import time
@@ -9,6 +10,7 @@ import random
 
 board = ''
 notDead = True
+
 
 def initializeGame():
 	print(chr(27) + "[2J")
@@ -40,14 +42,16 @@ def retrieveDisplay():
 			for j in i:
 				sys.stdout.write(j)
 			print ''
-		time.sleep(1.0/25)
+		time.sleep(1.0/100)
 
 def controlFish():
+	getch = Getch()
 	initCol = random.randint(80, 129)
 	initRow = random.randint(15, 20)
 	fish = Fish("fish.txt", initRow, initCol)
 	while notDead:
-		key = raw_input()
+		key = 'b'
+		#key = getch()
 		currCol = fish.getCol()
 		currRow = fish.getRow()
 		if key == 'w':
@@ -58,8 +62,9 @@ def controlFish():
 			fish.setRow(currRow + 1)
 		elif key == 'a':
 			fish.setCol(currCol - 1)
-		print "ok"
+		# global board
 		board.writeBoardFish(fish.getRow(), fish.getCol(), fish.getFish())
+		board.clearBoard()
 
 def main(args):
 	initializeGame()
@@ -68,5 +73,6 @@ def main(args):
 
 	displayThread.start()
 	fishThread.start()
+
 if __name__ == "__main__":
 	main(sys.argv)
