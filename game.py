@@ -84,8 +84,8 @@ def main(argv):
 	threads = []
 	print "Running server, generating sharks...let the games begin!"
 	while running:
-		randomY = random.randint(1, board.getHeight())
-		thread = threading.Thread(target=swimShark, args=[randomY, 1])
+		randomY = random.randint(-10, board.getHeight())
+		thread = threading.Thread(target=swimShark, args=[randomY, -70])
 		threads.append(thread)
 		thread.start()
 		time.sleep(5)
