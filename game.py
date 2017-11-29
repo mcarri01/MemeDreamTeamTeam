@@ -96,7 +96,7 @@ def main(argv):
 	for thread in threads:
 		thread.join()
 
-
+	board.endGame()
 	for process in processes:
 		os.killpg(os.getpgid(process.pid), signal.SIGTERM)
 
