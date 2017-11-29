@@ -50,10 +50,11 @@ class DisplayThread(threading.Thread):
 
 class FishThread(threading.Thread):
 
-	def __init__(self, stdscr):
+	def __init__(self, stdscr, username):
 		threading.Thread.__init__(self)
 
 		self.shutdown_flag = threading.Event()
+		self.username = username
 		self.stdscr = stdscr
 
 	def run(self):
@@ -63,7 +64,7 @@ class FishThread(threading.Thread):
 		# maybe fix bounds
 		initCol = random.randint(1, board.getWidth())
 		initRow = random.randint(1, board.getHeight())
-		fish = Fish("fish.txt", initRow, initCol, username)
+		fish = Fish("fish.txt", initRow, initCol, self.username)
 		while not self.shutdown_flag.is_set():
 			key = self.stdscr.getch()
 			curses.flushinp
@@ -113,7 +114,7 @@ def main(stdscr, username, wait):
 	stdscr.nodelay(True)
 
 	dispThread = DisplayThread(stdscr)
-	fishThread = FishThread(stdscr)
+	fishThread = FishThread(stdscr, username)
 	try:
 		dispThread.start()
 		fishThread.start()
