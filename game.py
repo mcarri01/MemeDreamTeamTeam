@@ -84,15 +84,14 @@ def main(argv):
 	board = Pyro4.Proxy(uri)
 
 	threads = []
-	while not board.gameStarted():
-		time.sleep(1)
-	print "Running server, generating sharks...let the games begin!"
+	print "Running server...let the games begin!"
 	while running:
-		randomY = random.randint(-10, board.getHeight())
-		thread = threading.Thread(target=swimShark, args=[randomY, -70])
-		threads.append(thread)
-		thread.start()
-		time.sleep(5)
+		if board.gameStarted():
+			randomY = random.randint(-10, board.getHeight())
+			thread = threading.Thread(target=swimShark, args=[randomY, -70])
+			threads.append(thread)
+			thread.start()
+			time.sleep(5)
 
 	for thread in threads:
 		thread.join()
