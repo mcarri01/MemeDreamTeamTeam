@@ -14,7 +14,6 @@ import random
 serverLock = threading.Semaphore(0)
 boardLock = threading.Semaphore(0)
 processes = []
-dinnerBell = False
 board = ''
 
 def startBoard(IP):
@@ -53,13 +52,7 @@ def swimShark(startRow, startCol):
 			
 			s.move(board)
 
-	global dinnerBell
-	dinnerBell = True
-
 def main(argv):
-	print(chr(27) + "[2J")
-	print(chr(27) + "[H")
-
 	processesStart = []
 	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 	s.connect(("8.8.8.8", 80))
@@ -81,6 +74,7 @@ def main(argv):
 	global board
 	board = Pyro4.Proxy(uri)
 
+	print "Running server, generating sharks...let the games begin!"
 	while True:
 		randomY = random.randint(1, board.getHeight())
 		thread = threading.Thread(target=swimShark, args=[randomY, 1])

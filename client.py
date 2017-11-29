@@ -30,7 +30,7 @@ class DisplayThread(threading.Thread):
 			delta = currTime - lastTime
 			lastTime = currTime
 			counter += delta.microseconds
-			if counter >= 1000000/60:
+			if counter >= 1000000/15:
 				counter = 0
 				global board
 				b = board.readBoard()
@@ -52,6 +52,7 @@ class FishThread(threading.Thread):
 		self.stdscr = stdscr
 
 	def run(self):
+		global board
 		shutdown_flag = threading.Event()
 		global notDead
 		# maybe fix bounds
