@@ -7,7 +7,7 @@ class Shark(object):
         self.shark = []
         self.col = startcol
         self.row = startrow
-        self.vertMove = random.uniform(-0.5, 0.5)
+        self.vertMove = random.uniform(-.4, .4)
         self.horizMove = random.uniform(0.1, 1)
         with open(filename) as f:
             for line in f:
@@ -20,7 +20,7 @@ class Shark(object):
 
     def move(self, board):
         self.col += self.horizMove
-        #self.row += self.vertMove
+        self.row += self.vertMove
 
         #self.row %= (board.getHeight() - 1)
 

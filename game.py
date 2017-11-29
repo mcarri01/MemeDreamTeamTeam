@@ -12,20 +12,22 @@ import socket
 import random
 import signal
 
-serverLock = threading.Semaphore(0)
+#serverLock = threading.Semaphore(0)
 boardLock = threading.Semaphore(0)
 processes = []
 board = ''
 running = True
 
 def startBoard(IP):
-	serverLock.acquire()
+#	serverLock.acquire()
+	processes.append(subprocess.Popen("python -m Pyro4.naming -n %s > /dev/null" % IP, shell=True, preexec_fn=os.setsid))
+	time.sleep(3)
 	processes.append(subprocess.Popen("python board.py %s > /dev/null" % IP, shell=True, preexec_fn=os.setsid))
+	time.sleep(3)
 	boardLock.release()
 
-def startServer(IP):
-	processes.append(subprocess.Popen("python -m Pyro4.naming -n %s > /dev/null" % IP, shell=True, preexec_fn=os.setsid))
-	serverLock.release()
+#def startServer(IP):
+#	serverLock.release()
 
 def swimShark(startRow, startCol):
 	s = Shark("shark.txt", startRow, startCol)
@@ -65,7 +67,7 @@ def main(argv):
 	s.connect(("8.8.8.8", 80))
 	IP = s.getsockname()[0]
 	s.close()
-	processesStart.append(threading.Thread(target = startServer, args = [IP]))
+	#processesStart.append(threading.Thread(target = startServer, args = [IP]))
 	processesStart.append(threading.Thread(target = startBoard, args = [IP]))
 
 	for p in processesStart:
