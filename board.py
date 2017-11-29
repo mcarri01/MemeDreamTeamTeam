@@ -105,6 +105,9 @@ class Board(object):
     def startGame(self):
         self.started = True
 
+    def endGame(self):
+        self.started = False
+
     def gameStarted(self):
         return self.started
 
