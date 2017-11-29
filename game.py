@@ -10,11 +10,13 @@ import multiprocessing as mp
 import signal
 import socket
 import random
+import signal
 
 serverLock = threading.Semaphore(0)
 boardLock = threading.Semaphore(0)
 processes = []
 board = ''
+running = True
 
 def startBoard(IP):
 	serverLock.acquire()
@@ -36,7 +38,7 @@ def swimShark(startRow, startCol):
 	lastTime = datetime.now()
 	counter = 0
 
-	while not offScreen:
+	while not offScreen or running:
 		currTime = datetime.now()
 		delta = currTime - lastTime
 		lastTime = currTime
@@ -52,7 +54,12 @@ def swimShark(startRow, startCol):
 			
 			s.move(board)
 
+def endserver(signum, stack):
+	global running
+	running = False
+
 def main(argv):
+	signal.signal(signal.SIGINT, endserver)
 	processesStart = []
 	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 	s.connect(("8.8.8.8", 80))
@@ -74,18 +81,18 @@ def main(argv):
 	global board
 	board = Pyro4.Proxy(uri)
 
+	threads = []
 	print "Running server, generating sharks...let the games begin!"
-	while True:
+	while running:
 		randomY = random.randint(1, board.getHeight())
 		thread = threading.Thread(target=swimShark, args=[randomY, 1])
+		threads.append(thread)
 		thread.start()
 		time.sleep(5)
 
 	for thread in threads:
-		thread.start()
-
-	for thread in threads:
 		thread.join()
+
 
 	for process in processes:
 		os.killpg(os.getpgid(process.pid), signal.SIGTERM)
