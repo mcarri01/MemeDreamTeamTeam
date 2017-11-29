@@ -77,8 +77,6 @@ class FishThread(threading.Thread):
 				diff = (board.getWidth())-currCol-1
 				if fish.getDisplayNameLen() > diff:
 					fish.setDisplayName(fish.getDisplayName()[:diff])
-				# elif len(fish.getName()) <= diff:
-				# 	fish.setDisplayName(fish.getName())
 				fish.setCol(currCol + 1)
 			elif key == ord('s') and currRow != board.getHeight()-fish.getFishHeight()-1:
 				fish.setRow(currRow + 1)
