@@ -67,7 +67,7 @@ def swimShark(startRow, startCol):
 
 		offScreen = board.writeBoardShark(s.row, s.col, s.vertMove, s.horizMove, 9, 55, s.shark)
 
-		board.clearBoard()
+		#board.clearBoard()
 		
 		prevCol = s.getCol()
 		prevRow = s.getRow()
@@ -82,12 +82,10 @@ def main(argv):
 	print(chr(27) + "[H")
 
 	processesStart = []
-	#IP = subprocess.check_output("ifconfig |grep inet\ ", shell=True).split(' ')[5]
 	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 	s.connect(("8.8.8.8", 80))
 	IP = s.getsockname()[0]
 	s.close()
-	print IP
 	processesStart.append(threading.Thread(target = startServer, args = [IP]))
 	processesStart.append(threading.Thread(target = startBoard, args = [IP]))
 

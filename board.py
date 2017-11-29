@@ -7,6 +7,8 @@ import sys
 class Board(object):
     def __init__(self):
         self.board = []
+        self.started = False
+        self.playerCount = 0
         self.height = 30
         self.width = 100
         for j in range(self.height):
@@ -70,8 +72,14 @@ class Board(object):
         
         return False
 
-    def writeBoardFish(self, row, col, fish):
+    def writeBoardFish(self, row, col, fish, name):
+        tmpcol = int(col)
         tmprow = int(row)
+        for c in name:
+            self.board[tmprow][tmpcol] = c
+            tmpcol += 1
+
+        tmprow = int(row) + 1
         for line in fish:
             tmpcol = int(col)
             for c in line:
@@ -85,6 +93,20 @@ class Board(object):
     def getWidth(self):
         return self.width
 
+    def numPlayers(self):
+        return self.playerCount
+
+    def addPlayer(self):
+        self.playerCount += 1
+
+    def decrementPlayer(self):
+        self.playerCount -= 1
+
+    def startGame(self):
+        self.started = True
+
+    def gameStarted(self):
+        return self.started
 
 def main(args):
     Pyro4.config.SERVERTYPE = "multiplex"
