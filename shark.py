@@ -7,8 +7,8 @@ class Shark(object):
         self.shark = []
         self.col = startcol
         self.row = startrow
-        #self.vertMove = random.uniform(-0.5, 0.5)
-        self.vertMove = 0
+        self.vertMove = random.uniform(-1.0, 1.0)
+        #self.vertMove = 0
         self.horizMove = random.uniform(0.1, 1)
         with open(filename) as f:
             for line in f:
