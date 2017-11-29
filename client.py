@@ -2,6 +2,7 @@ import sys
 import os
 import threading
 from fish import *
+from title import *
 import Pyro4
 import socket
 import time
@@ -21,6 +22,7 @@ class DisplayThread(threading.Thread):
 
 		self.shutdown_flag = threading.Event()
 		self.stdscr = stdscr
+		self.titleText = ''.join(open("title.txt").readlines()).strip('\r')
 
 	def run(self):
 		lastTime = datetime.now()
@@ -39,7 +41,10 @@ class DisplayThread(threading.Thread):
 					for c in line:
 						string += c
 					string += '\n'
+				#string += titleText
 				self.stdscr.addstr(string, curses.color_pair(1))
+				self.stdscr.addstr(titleString)
+				#self.stdscr.addstr("dog")
 				self.stdscr.move(0, 0)			
 				board.clearBoard()
 
