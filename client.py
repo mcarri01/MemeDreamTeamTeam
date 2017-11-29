@@ -54,6 +54,7 @@ class FishThread(threading.Thread):
 		threading.Thread.__init__(self)
 
 		self.shutdown_flag = threading.Event()
+		self.username = username
 		self.stdscr = stdscr
 		self.username = username
 
