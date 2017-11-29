@@ -50,11 +50,12 @@ class DisplayThread(threading.Thread):
 
 class FishThread(threading.Thread):
 
-	def __init__(self, stdscr):
+	def __init__(self, stdscr, username):
 		threading.Thread.__init__(self)
 
 		self.shutdown_flag = threading.Event()
 		self.stdscr = stdscr
+		self.username = username
 
 	def run(self):
 		global board
@@ -63,21 +64,28 @@ class FishThread(threading.Thread):
 		# maybe fix bounds
 		initCol = random.randint(1, board.getWidth())
 		initRow = random.randint(1, board.getHeight())
-		fish = Fish("fish.txt", initRow, initCol, username)
+		fish = Fish("fish.txt", initRow, initCol, self.username)
 		while not self.shutdown_flag.is_set():
 			key = self.stdscr.getch()
 			curses.flushinp
 			currCol = fish.getCol()
 			currRow = fish.getRow()
-			if key == ord('w'):
+			if key == ord('w') and currRow != 1:
 				fish.setRow(currRow - 1)
-			elif key == ord('d'):
+			elif key == ord('d') and currCol != board.getWidth()-fish.getFishWidth():
+				diff = (board.getWidth())-currCol-1
+				if fish.getDisplayNameLen() > diff:
+					fish.setDisplayName(fish.getDisplayName()[:diff])
+				# elif len(fish.getName()) <= diff:
+				# 	fish.setDisplayName(fish.getName())
 				fish.setCol(currCol + 1)
-			elif key == ord('s'):
+			elif key == ord('s') and currRow != board.getHeight()-fish.getFishHeight()-1:
 				fish.setRow(currRow + 1)
-			elif key == ord('a'):
+			elif key == ord('a') and currCol != 1:
+				if fish.getDisplayNameLen() < fish.getNameLen():
+					fish.oneMoreChar()
 				fish.setCol(currCol - 1)
-			board.writeBoardFish(fish.getRow(), fish.getCol(), fish.getFish(), fish.getName())
+			board.writeBoardFish(fish.getRow(), fish.getCol(), fish.getFish(), fish.getDisplayName())
 
 class ServiceExit(Exception):
 	pass
@@ -113,7 +121,7 @@ def main(stdscr, username, wait):
 	stdscr.nodelay(True)
 
 	dispThread = DisplayThread(stdscr)
-	fishThread = FishThread(stdscr)
+	fishThread = FishThread(stdscr, username)
 	try:
 		dispThread.start()
 		fishThread.start()

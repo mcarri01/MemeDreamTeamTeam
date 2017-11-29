@@ -2,6 +2,10 @@ class Fish(object):
     def __init__(self, filename, startrow, startcol, username):
         self.fish = []
         self.name = username
+        print len(username)
+        self.displayName = username
+        self.height = 4
+        self.width = 5#max(len(self.displayName), 5)
         self.col = startcol
         self.row = startrow
         with open(filename) as f:
@@ -12,6 +16,21 @@ class Fish(object):
 
     def getName(self):
         return self.name
+
+    def oneMoreChar(self):
+        self.displayName = self.displayName + self.name[len(self.displayName)]
+
+    def getNameLen(self):
+        return len(self.name)
+
+    def getDisplayName(self):
+        return self.displayName
+
+    def getDisplayNameLen(self):
+        return len(self.displayName)
+
+    def setDisplayName(self, newName):
+        self.displayName = newName
 
     def getCol(self):
         return self.col
@@ -27,3 +46,9 @@ class Fish(object):
 
     def setRow(self, row):
         self.row = row
+
+    def getFishHeight(self):
+        return self.height
+
+    def getFishWidth(self):
+        return self.width
