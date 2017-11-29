@@ -1,13 +1,15 @@
 import os
 import sys
+import random
 
 class Shark(object):
     def __init__(self, filename, startrow, startcol):
         self.shark = []
         self.col = startcol
         self.row = startrow
-        self.vertMove = .25
-        self.horizMove = 1
+        #self.vertMove = random.uniform(-0.5, 0.5)
+        self.vertMove = 0
+        self.horizMove = random.uniform(0.1, 1)
         with open(filename) as f:
             for line in f:
                 tmp = line.split('\n')[0]
@@ -19,9 +21,9 @@ class Shark(object):
 
     def move(self, board):
         self.col += self.horizMove
-        self.row += self.vertMove
+        #self.row += self.vertMove
 
-        self.row %= (board.getHeight() - 1)
+        #self.row %= (board.getHeight() - 1)
 
 
     def getCol(self):
