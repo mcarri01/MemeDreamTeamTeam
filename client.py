@@ -42,6 +42,8 @@ class DisplayThread(threading.Thread):
 						string += c
 					string += '\n'
 				self.stdscr.addstr(string, curses.color_pair(1))
+				if not board.gameStarted():
+					self.stdscr.addstr("Waiting for players...")
 				self.stdscr.addstr(titleString)
 				self.stdscr.move(0, 0)			
 				board.clearBoard()
@@ -75,7 +77,6 @@ class FishThread(threading.Thread):
 				fish.setRow(currRow + 1)
 			elif key == ord('a'):
 				fish.setCol(currCol - 1)
-
 			board.writeBoardFish(fish.getRow(), fish.getCol(), fish.getFish(), fish.getName())
 
 class ServiceExit(Exception):
@@ -97,12 +98,11 @@ def initializeGame(waiting):
 	global board
 	board = Pyro4.Proxy(uri)
 	board.addPlayer()
-	if waiting == 'y':
-		num = board.numPlayers()
-		while num == 1:
-			num = board.numPlayers()
-
-	board.startGame()
+	if waiting != 'y':
+		board.startGame()
+	else:
+		if board.numPlayers() > 1:
+			board.startGame()
 
 
 def main(stdscr, username, wait):

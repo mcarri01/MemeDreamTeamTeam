@@ -38,7 +38,7 @@ def swimShark(startRow, startCol):
 	lastTime = datetime.now()
 	counter = 0
 
-	while not offScreen or running:
+	while not offScreen and running:
 		currTime = datetime.now()
 		delta = currTime - lastTime
 		lastTime = currTime
@@ -82,6 +82,8 @@ def main(argv):
 	board = Pyro4.Proxy(uri)
 
 	threads = []
+	while not board.gameStarted():
+		time.sleep(1)
 	print "Running server, generating sharks...let the games begin!"
 	while running:
 		randomY = random.randint(-10, board.getHeight())
