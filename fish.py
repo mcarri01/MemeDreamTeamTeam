@@ -4,8 +4,8 @@ class Fish(object):
         self.name = username
         print len(username)
         self.displayName = username
-        self.height = 4
-        self.width = 5#max(len(self.displayName), 5)
+        self.height = 1
+        self.width = 3
         self.col = startcol
         self.row = startrow
         with open(filename) as f:

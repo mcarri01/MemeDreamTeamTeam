@@ -11,6 +11,7 @@ class Board(object):
         self.playerCount = 0
         self.height = 30
         self.width = 100
+        self.sharkChars = ["'", '`', ')', '(', '-', ',', '/', '.', '0', ';', '|', '_', '~']
         for j in range(self.height):
             string = ['+']
             for i in range(self.width-1):
@@ -83,9 +84,13 @@ class Board(object):
         for line in fish:
             tmpcol = int(col)
             for c in line:
-                self.board[tmprow][tmpcol] = c
+                if self.board[tmprow][tmpcol] in self.sharkChars:
+                    return True
+                else:
+                    self.board[tmprow][tmpcol] = c
                 tmpcol += 1
             tmprow += 1
+        return False
         
     def getHeight(self):
         return self.height

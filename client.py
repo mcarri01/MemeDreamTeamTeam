@@ -11,9 +11,10 @@ from datetime import datetime
 import curses
 from curses import wrapper
 import signal
+import re
 
 board = []
-notDead = True
+dead = False
 
 class DisplayThread(threading.Thread):
 
@@ -60,31 +61,36 @@ class FishThread(threading.Thread):
 
 	def run(self):
 		global board
+		global dead
 		shutdown_flag = threading.Event()
-		global notDead
 		# maybe fix bounds
 		initCol = random.randint(1, board.getWidth())
 		initRow = random.randint(1, board.getHeight())
 		fish = Fish("fish.txt", initRow, initCol, self.username)
 		while not self.shutdown_flag.is_set():
-			key = self.stdscr.getch()
-			curses.flushinp
-			currCol = fish.getCol()
-			currRow = fish.getRow()
-			if key == ord('w') and currRow != 1:
-				fish.setRow(currRow - 1)
-			elif key == ord('d') and currCol != board.getWidth()-fish.getFishWidth():
-				diff = (board.getWidth())-currCol-1
-				if fish.getDisplayNameLen() > diff:
-					fish.setDisplayName(fish.getDisplayName()[:diff])
-				fish.setCol(currCol + 1)
-			elif key == ord('s') and currRow != board.getHeight()-fish.getFishHeight()-1:
-				fish.setRow(currRow + 1)
-			elif key == ord('a') and currCol != 1:
-				if fish.getDisplayNameLen() < fish.getNameLen():
-					fish.oneMoreChar()
-				fish.setCol(currCol - 1)
-			board.writeBoardFish(fish.getRow(), fish.getCol(), fish.getFish(), fish.getDisplayName())
+			if not dead:
+				key = self.stdscr.getch()
+				curses.flushinp
+				currCol = fish.getCol()
+				currRow = fish.getRow()
+				if key == ord('w') and currRow != 1:
+					fish.setRow(currRow - 1)
+				elif key == ord('d') and currCol != board.getWidth()-fish.getFishWidth():
+					diff = (board.getWidth())-currCol-1
+					if fish.getDisplayNameLen() > diff:
+						fish.setDisplayName(fish.getDisplayName()[:diff])
+					fish.setCol(currCol + 1)
+				elif key == ord('s') and currRow != board.getHeight()-fish.getFishHeight()-2:
+					fish.setRow(currRow + 1)
+				elif key == ord('a') and currCol != 1:
+					if fish.getDisplayNameLen() < fish.getNameLen():
+						fish.oneMoreChar()
+					fish.setCol(currCol - 1)
+				collision = board.writeBoardFish(fish.getRow(), fish.getCol(), fish.getFish(), fish.getDisplayName())
+				if collision:
+					dead = True
+			else:
+				continue
 
 class ServiceExit(Exception):
 	pass
@@ -138,6 +144,7 @@ def main(stdscr, username, wait):
 
 if __name__ == "__main__":
 	username = raw_input("Please choose your username: ")
+	username = re.sub(r'[^a-zA-Z]', '', username)
 	wait = raw_input("Wait for more players? (y/n): ")
 	wrapper(main, username, wait)
 

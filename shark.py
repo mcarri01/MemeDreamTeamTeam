@@ -22,7 +22,7 @@ class Shark(object):
         self.col += self.horizMove
         self.row += self.vertMove
 
-        #self.row %= (board.getHeight() - 1)
+        self.row %= (board.getHeight() - 1)
 
 
     def getCol(self):
