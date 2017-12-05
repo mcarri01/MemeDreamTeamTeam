@@ -85,9 +85,12 @@ def main(argv):
 
 	threads = []
 	print ("Running server on " + IP + "...let the games begin!")
+	prevPlayers = board.numPlayers()
 	while running:
-		if board.numPlayers() > 0:
+		currPlayers = board.numPlayers()
+		if currPlayers > prevPlayers:
 			print ("Player joined the game!")
+			prevPlayers = currPlayers
 		if board.gameStarted():
 			wave = board.getWave()
 			for i in range (0, wave):
