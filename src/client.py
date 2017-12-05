@@ -23,7 +23,7 @@ class DisplayThread(threading.Thread):
 
 		self.shutdown_flag = threading.Event()
 		self.stdscr = stdscr
-		self.titleText = ''.join(open("title.txt").readlines()).strip('\r')
+		self.titleText = ''.join(open("models/title.txt").readlines()).strip('\r')
 
 	def run(self):
 		lastTime = datetime.now()
@@ -66,7 +66,7 @@ class FishThread(threading.Thread):
 		# maybe fix bounds
 		initCol = random.randint(1, board.getWidth())
 		initRow = random.randint(1, board.getHeight())
-		fish = Fish("fish.txt", initRow, initCol, self.username)
+		fish = Fish("models/fish.txt", initRow, initCol, self.username)
 		while not self.shutdown_flag.is_set():
 			if not dead:
 				key = self.stdscr.getch()
@@ -89,8 +89,6 @@ class FishThread(threading.Thread):
 				collision = board.writeBoardFish(fish.getRow(), fish.getCol(), fish.getFish(), fish.getDisplayName())
 				if collision:
 					dead = True
-			else:
-				continue
 
 class ServiceExit(Exception):
 	pass

@@ -30,7 +30,7 @@ def startBoard(IP):
 #	serverLock.release()
 
 def swimShark(startRow, startCol):
-	s = Shark("shark.txt", startRow, startCol)
+	s = Shark("models/shark.txt", startRow, startCol)
 
 	offScreen = board.writeBoardShark(s.row, s.col, s.vertMove, s.horizMove, 9, 55, s.shark)
 
