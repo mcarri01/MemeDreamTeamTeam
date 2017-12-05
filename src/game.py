@@ -87,11 +87,18 @@ def main(argv):
 	print "Running server...let the games begin!"
 	while running:
 		if board.gameStarted():
-			randomY = random.randint(-10, board.getHeight())
-			thread = threading.Thread(target=swimShark, args=[randomY, -70])
-			threads.append(thread)
-			thread.start()
-			time.sleep(5)
+			wave = board.getWave()
+			for i in range (0, wave):
+				randomY = random.randint(-10, board.getHeight())
+				for i in range(0, wave):
+					thread = threading.Thread(target=swimShark, args=[randomY, -70])
+					threads.append(thread)
+				for thread in threads:
+					thread.start()
+				for thread in threads:
+					thread.join()
+				threads = []
+			board.updateWave()
 
 	for thread in threads:
 		thread.join()

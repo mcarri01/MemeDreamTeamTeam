@@ -37,6 +37,7 @@ class DisplayThread(threading.Thread):
 				counter = 0
 				global board
 				b = board.readBoard()
+				wave = board.getWave()
 				string = ''
 				for line in b:
 					for c in line:
@@ -44,7 +45,10 @@ class DisplayThread(threading.Thread):
 					string += '\n'
 				self.stdscr.addstr(string, curses.color_pair(1))
 				if not board.gameStarted():
-					self.stdscr.addstr("Waiting for players...")
+					self.stdscr.addstr("Waiting for players...\n")
+				else:
+					s = "Current wave: " + str(wave) + "\n"
+					self.stdscr.addstr(s)
 				self.stdscr.addstr(titleString)
 				self.stdscr.move(0, 0)			
 				board.clearBoard()

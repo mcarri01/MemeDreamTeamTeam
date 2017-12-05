@@ -9,6 +9,7 @@ class Board(object):
         self.board = []
         self.started = False
         self.playerCount = 0
+        self.wave = 1
         self.height = 30
         self.width = 100
         self.sharkChars = ["'", '`', ')', '(', '-', ',', '/', '.', '0', ';', '|', '_', '~']
@@ -115,6 +116,12 @@ class Board(object):
 
     def gameStarted(self):
         return self.started
+
+    def getWave(self):
+        return self.wave
+
+    def updateWave(self):
+        self.wave += 1
 
 def main(args):
     Pyro4.config.SERVERTYPE = "multiplex"
