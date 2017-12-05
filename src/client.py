@@ -12,6 +12,7 @@ import curses
 from curses import wrapper
 import signal
 import re
+import argparse
 
 board = []
 dead = False
@@ -48,7 +49,7 @@ class DisplayThread(threading.Thread):
 					self.stdscr.addstr("Waiting for players...\n")
 				else:
 					s = "Current wave: " + str(wave) + "\n"
-					self.stdscr.addstr(s)
+					self.stdscr.addstr(s, curses.A_BOLD)
 				self.stdscr.addstr(titleString)
 				self.stdscr.move(0, 0)			
 				board.clearBoard()
@@ -101,13 +102,13 @@ def receive_sig(signum, stack):
 	raise ServiceExit
 
 
-def initializeGame(waiting):
-	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-	s.connect(("8.8.8.8", 80))
-	IP = s.getsockname()[0]
-	s.close()
+def initializeGame(waiting, ip):
+	# s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	# s.connect(("8.8.8.8", 80))
+	# IP = s.getsockname()[0]
+	# s.close()
 
-	NS = Pyro4.locateNS(host=IP, port=9090, broadcast=True)
+	NS = Pyro4.locateNS(host=ip, port=9090, broadcast=True)
 
 	uri = NS.lookup("example.board")
 	global board
@@ -120,8 +121,17 @@ def initializeGame(waiting):
 			board.startGame()
 
 
-def main(stdscr, username, wait):
-	initializeGame(wait)
+def parseArgs(argv):
+
+    parser = argparse.ArgumentParser(description='Client program for SharksAndMinnows game!')
+    parser.add_argument('-i', dest='ip', type=str,
+                        help='IPv4 Address of Name Server')
+
+    return parser.parse_args().ip
+
+
+def main(stdscr, username, wait, ip):
+	initializeGame(wait, ip)
 	signal.signal(signal.SIGTERM, receive_sig)
 	signal.signal(signal.SIGINT, receive_sig)
 	curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLUE)
@@ -145,9 +155,10 @@ def main(stdscr, username, wait):
 		fishThread.join()
 
 if __name__ == "__main__":
+	ip = parseArgs(sys.argv)
 	username = raw_input("Please choose your username: ")
 	username = re.sub(r'[^a-zA-Z]', '', username)
 	wait = raw_input("Wait for more players? (y/n): ")
-	wrapper(main, username, wait)
+	wrapper(main, username, wait, ip)
 
 
