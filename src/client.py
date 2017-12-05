@@ -102,18 +102,14 @@ def receive_sig(signum, stack):
 	raise ServiceExit
 
 
-def initializeGame(waiting, ip):
-	# s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-	# s.connect(("8.8.8.8", 80))
-	# IP = s.getsockname()[0]
-	# s.close()
+def initializeGame(waiting, ip, name):
 
 	NS = Pyro4.locateNS(host=ip, port=9090, broadcast=True)
 
 	uri = NS.lookup("example.board")
 	global board
 	board = Pyro4.Proxy(uri)
-	board.addPlayer()
+	board.addPlayer(name)
 	if waiting != 'y':
 		board.startGame()
 	else:
@@ -131,7 +127,7 @@ def parseArgs(argv):
 
 
 def main(stdscr, username, wait, ip):
-	initializeGame(wait, ip)
+	initializeGame(wait, ip, username)
 	signal.signal(signal.SIGTERM, receive_sig)
 	signal.signal(signal.SIGINT, receive_sig)
 	curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLUE)

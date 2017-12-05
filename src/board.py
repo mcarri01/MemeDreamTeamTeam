@@ -7,6 +7,7 @@ import sys
 class Board(object):
     def __init__(self):
         self.board = []
+        self.playerList = []
         self.started = False
         self.playerCount = 0
         self.wave = 1
@@ -102,7 +103,8 @@ class Board(object):
     def numPlayers(self):
         return self.playerCount
 
-    def addPlayer(self):
+    def addPlayer(self, name):
+        self.playerList.append(name)
         self.playerCount += 1
 
     def decrementPlayer(self):

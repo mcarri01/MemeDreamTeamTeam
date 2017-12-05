@@ -20,15 +20,12 @@ board = ''
 running = True
 
 def startBoard(IP):
-#	serverLock.acquire()
+
 	processes.append(subprocess.Popen("python -m Pyro4.naming -n %s > /dev/null" % IP, shell=True, preexec_fn=os.setsid))
 	time.sleep(3)
 	processes.append(subprocess.Popen("python board.py %s > /dev/null" % IP, shell=True, preexec_fn=os.setsid))
 	time.sleep(3)
 	boardLock.release()
-
-#def startServer(IP):
-#	serverLock.release()
 
 def swimShark(startRow, startCol):
 	s = Shark("models/shark.txt", startRow, startCol)
