@@ -11,6 +11,7 @@ import signal
 import socket
 import random
 import signal
+import requests
 
 #serverLock = threading.Semaphore(0)
 boardLock = threading.Semaphore(0)
@@ -67,7 +68,6 @@ def main(argv):
 	s.connect(("8.8.8.8", 80))
 	IP = s.getsockname()[0]
 	s.close()
-	#processesStart.append(threading.Thread(target = startServer, args = [IP]))
 	processesStart.append(threading.Thread(target = startBoard, args = [IP]))
 
 	for p in processesStart:
@@ -84,8 +84,10 @@ def main(argv):
 	board = Pyro4.Proxy(uri)
 
 	threads = []
-	print "Running server...let the games begin!"
+	print ("Running server on " + IP + "...let the games begin!")
 	while running:
+		if board.numPlayers() > 0:
+			print ("Player joined the game!")
 		if board.gameStarted():
 			wave = board.getWave()
 			for i in range (0, wave):
