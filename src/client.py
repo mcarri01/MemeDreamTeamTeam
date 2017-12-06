@@ -37,8 +37,8 @@ class DisplayThread(threading.Thread):
 			lastTime = currTime
 			counter += delta.microseconds
 			if counter >= 1000000/15:
-				counter = 0
 				global board
+				counter = 0
 				#b = board.readBoard()
 				wave = board.getWave()
 				string = ''

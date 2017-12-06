@@ -44,7 +44,7 @@ def swimShark(startRow, startCol):
 		lastTime = currTime
 
 		counter += delta.microseconds
-		if counter >= 1000000/15:
+		if counter >= 1000000/30:
 			counter = 0
 
 			offScreen = board.writeBoardShark(s.row, s.col, s.vertMove, s.horizMove, 9, 55, s.shark)
