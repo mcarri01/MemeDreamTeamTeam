@@ -71,9 +71,7 @@ class FishThread(threading.Thread):
 		global dead
 		shutdown_flag = threading.Event()
 		# maybe fix bounds
-		initCol = random.randint(1, board.getWidth())
-		initRow = random.randint(1, board.getHeight())
-		fish = Fish("models/fish.txt", initRow, initCol, self.username)
+		fish = Fish("models/fish.txt", 15, 75, self.username)
 		while not self.shutdown_flag.is_set():
 			key = self.stdscr.getch()
 			curses.flushinp
