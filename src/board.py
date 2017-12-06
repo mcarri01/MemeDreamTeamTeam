@@ -118,8 +118,12 @@ class Board(object):
         self.playerList.append(name)
         self.playerCount += 1
 
-    def decrementPlayer(self):
+    def decrementPlayer(self, username):
         self.playerCount -= 1
+        self.playerList.remove(username)
+
+    def getPlayers(self):
+        return self.playerList
 
     def startGame(self):
         self.started = True

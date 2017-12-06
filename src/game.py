@@ -63,6 +63,7 @@ class SharkManager(threading.Thread):
                 for shark in self.sharks:
                     shark.move(board)
 
+
 def endserver(signum, stack):
     global running
     running = False
