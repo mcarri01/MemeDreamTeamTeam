@@ -46,11 +46,10 @@ class DisplayThread(threading.Thread):
                     string += c
                 string += '\n'
             self.stdscr.addstr(string, curses.color_pair(1))
-            players = board.getPlayers()
             if not board.gameStarted():
                 board.clearBoard()
                 self.stdscr.addstr("Waiting for players...\n")
-            elif self.user not in players:
+            elif self.user not in board.getPlayers():
                 self.stdscr.addstr("Game Over...you died!\n")
             else:
                 s = "Current wave: " + str(wave) + ", Players alive: " + " ".join(players) + "\n"
@@ -147,7 +146,7 @@ def main(stdscr, username, wait, ip):
 
         dispThread.shutdown_flag.set()
         fishThread.shutdown_flag.set()
-        if board.numPlayers() == 0:
+        if username in board.getPlayers():
             board.decrementPlayer(username)
         dispThread.join()
         fishThread.join()
