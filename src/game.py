@@ -44,9 +44,9 @@ def swimShark(startRow, startCol):
 		lastTime = currTime
 
 		counter += delta.microseconds
-		if counter >= 1000000/30:
+		if counter >= 1000000/20:
 			counter = 0
-
+			board.clearBoard()
 			offScreen = board.writeBoardShark(s.row, s.col, s.vertMove, s.horizMove, 9, 55, s.shark)
 
 			prevCol = s.getCol()
@@ -87,6 +87,9 @@ def main(argv):
 		currPlayers = board.numPlayers()
 		if currPlayers > prevPlayers:
 			print ("Player joined the game!")
+			prevPlayers = currPlayers
+		elif currPlayers < prevPlayers:
+			print ("Player has died!")
 			prevPlayers = currPlayers
 		if board.gameStarted():
 			wave = board.getWave()

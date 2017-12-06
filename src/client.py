@@ -15,7 +15,6 @@ import re
 import argparse
 
 board = []
-b = []
 dead = False
 
 class DisplayThread(threading.Thread):
@@ -36,25 +35,26 @@ class DisplayThread(threading.Thread):
 			delta = currTime - lastTime
 			lastTime = currTime
 			counter += delta.microseconds
-			if counter >= 1000000/15:
-				global board
-				counter = 0
-				#b = board.readBoard()
-				wave = board.getWave()
-				string = ''
-				for line in b:
-					for c in line:
-						string += c
-					string += '\n'
-				self.stdscr.addstr(string, curses.color_pair(1))
-				if not board.gameStarted():
-					self.stdscr.addstr("Waiting for players...\n")
-				else:
-					s = "Current wave: " + str(wave) + "\n"
-					self.stdscr.addstr(s, curses.A_BOLD)
-				self.stdscr.addstr(titleString)
-				self.stdscr.move(0, 0)			
-				board.clearBoard()
+			#if counter >= 1000000/20:
+			global board
+			#counter = 0
+			b = board.readBoard()
+			wave = board.getWave()
+			string = ''
+			for line in b:
+				for c in line:
+					string += c
+				string += '\n'
+			self.stdscr.addstr(string, curses.color_pair(1))
+			if not board.gameStarted():
+				self.stdscr.addstr("Waiting for players...\n")
+			elif board.numPlayers() == 0:
+				self.stdscr.addstr("Game Over...you died!\n")
+			else:
+				s = "Current wave: " + str(wave) + "\n"
+				self.stdscr.addstr(s, curses.A_BOLD)
+			self.stdscr.addstr(titleString)
+			self.stdscr.move(0, 0)			
 
 class FishThread(threading.Thread):
 
@@ -68,7 +68,6 @@ class FishThread(threading.Thread):
 
 	def run(self):
 		global board
-		global b
 		global dead
 		shutdown_flag = threading.Event()
 		# maybe fix bounds
@@ -76,11 +75,11 @@ class FishThread(threading.Thread):
 		initRow = random.randint(1, board.getHeight())
 		fish = Fish("models/fish.txt", initRow, initCol, self.username)
 		while not self.shutdown_flag.is_set():
+			key = self.stdscr.getch()
+			curses.flushinp
+			currCol = fish.getCol()
+			currRow = fish.getRow()
 			if not dead:
-				key = self.stdscr.getch()
-				curses.flushinp
-				currCol = fish.getCol()
-				currRow = fish.getRow()
 				if key == ord('w') and currRow != 1:
 					fish.setRow(currRow - 1)
 				elif key == ord('d') and currCol != board.getWidth()-fish.getFishWidth():
@@ -94,9 +93,10 @@ class FishThread(threading.Thread):
 					if fish.getDisplayNameLen() < fish.getNameLen():
 						fish.oneMoreChar()
 					fish.setCol(currCol - 1)
-				collision, b = board.writeBoardFish(fish.getRow(), fish.getCol(), fish.getFish(), fish.getDisplayName())
+				collision = board.writeBoardFish(fish.getRow(), fish.getCol(), fish.getFish(), fish.getDisplayName())
 				if collision:
 					dead = True
+					board.decrementPlayer()
 
 class ServiceExit(Exception):
 	pass

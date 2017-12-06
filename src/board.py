@@ -87,12 +87,12 @@ class Board(object):
             tmpcol = int(col)
             for c in line:
                 if self.board[tmprow][tmpcol] in self.sharkChars:
-                    return True, self.board
+                    return True
                 else:
                     self.board[tmprow][tmpcol] = c
                 tmpcol += 1
             tmprow += 1
-        return False, self.board
+        return False
         
     def getHeight(self):
         return self.height
