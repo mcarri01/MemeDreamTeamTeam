@@ -152,8 +152,11 @@ def main(stdscr, username, wait, ip):
         fishThread.join()
 
 if __name__ == "__main__":
+    global board
     ip = parseArgs(sys.argv)
     username = raw_input("Please choose your username: ")
+    while username in board.getPlayers():
+        username = raw_input("Username already taken. Choose another: ")
     username = re.sub(r'[^a-zA-Z]', '', username)
     wait = raw_input("Wait for more players? (y?): ")
     wrapper(main, username, wait, ip)
