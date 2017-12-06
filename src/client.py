@@ -15,6 +15,7 @@ import re
 import argparse
 
 board = []
+b = []
 dead = False
 
 class DisplayThread(threading.Thread):
@@ -27,6 +28,7 @@ class DisplayThread(threading.Thread):
 		self.titleText = ''.join(open("models/title.txt").readlines()).strip('\r')
 
 	def run(self):
+		global b
 		lastTime = datetime.now()
 		counter = 0
 		while not self.shutdown_flag.is_set():
@@ -37,7 +39,7 @@ class DisplayThread(threading.Thread):
 			if counter >= 1000000/15:
 				counter = 0
 				global board
-				b = board.readBoard()
+				#b = board.readBoard()
 				wave = board.getWave()
 				string = ''
 				for line in b:
@@ -66,6 +68,7 @@ class FishThread(threading.Thread):
 
 	def run(self):
 		global board
+		global b
 		global dead
 		shutdown_flag = threading.Event()
 		# maybe fix bounds
@@ -91,7 +94,7 @@ class FishThread(threading.Thread):
 					if fish.getDisplayNameLen() < fish.getNameLen():
 						fish.oneMoreChar()
 					fish.setCol(currCol - 1)
-				collision = board.writeBoardFish(fish.getRow(), fish.getCol(), fish.getFish(), fish.getDisplayName())
+				collision, b = board.writeBoardFish(fish.getRow(), fish.getCol(), fish.getFish(), fish.getDisplayName())
 				if collision:
 					dead = True
 
@@ -127,6 +130,7 @@ def parseArgs(argv):
 
 
 def main(stdscr, username, wait, ip):
+	global b
 	initializeGame(wait, ip, username)
 	signal.signal(signal.SIGTERM, receive_sig)
 	signal.signal(signal.SIGINT, receive_sig)
@@ -135,6 +139,7 @@ def main(stdscr, username, wait, ip):
 
 	dispThread = DisplayThread(stdscr)
 	fishThread = FishThread(stdscr, username)
+	b = board.readBoard()
 	try:
 		dispThread.start()
 		fishThread.start()
