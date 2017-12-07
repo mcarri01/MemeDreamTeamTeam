@@ -113,8 +113,8 @@ def initializeGame(ip):
     board = Pyro4.Proxy(uri)
     username = raw_input("Please choose your username: ")
     username = re.sub(r'[^a-zA-Z]', '', username)
-    while username in board.getPlayers():
-        username = raw_input("Username already taken. Choose another: ")
+    while username in board.getPlayers() or len(username) > 9:
+        username = raw_input("Invalid username. Choose another: ")
         username = re.sub(r'[^a-zA-Z]', '', username)
     board.addPlayer(username)
     waiting = raw_input("Wait for more players? (y?): ")
