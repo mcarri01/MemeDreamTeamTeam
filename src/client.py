@@ -46,10 +46,11 @@ class DisplayThread(threading.Thread):
                     string += c
                 string += '\n'
             self.stdscr.addstr(string, curses.color_pair(1))
+            players = board.getPlayers()
             if not board.gameStarted():
                 board.clearBoard()
                 self.stdscr.addstr("Waiting for players...\n")
-            elif self.user not in board.getPlayers():
+            elif self.user not in players:
                 self.stdscr.addstr("Game Over...you died!\n")
             else:
                 s = "Current wave: " + str(wave) + ", Players alive: " + " ".join(players) + "\n"
@@ -103,18 +104,25 @@ def receive_sig(signum, stack):
     raise ServiceExit
 
 
-def initializeGame(waiting, ip, name):
+def initializeGame(ip):
 
     NS = Pyro4.locateNS(host=ip, port=9090, broadcast=True)
 
     uri = NS.lookup("example.board")
     global board
     board = Pyro4.Proxy(uri)
-    board.addPlayer(name)
+    username = raw_input("Please choose your username: ")
+    username = re.sub(r'[^a-zA-Z]', '', username)
+    while username in board.getPlayers():
+        username = raw_input("Username already taken. Choose another: ")
+        username = re.sub(r'[^a-zA-Z]', '', username)
+    board.addPlayer(username)
+    waiting = raw_input("Wait for more players? (y?): ")
     if waiting != 'y':
         board.startGame()
     elif board.numPlayers() > 1:
         board.startGame()
+    return username
 
 def parseArgs(argv):
 
@@ -125,9 +133,8 @@ def parseArgs(argv):
     return parser.parse_args().ip
 
 
-def main(stdscr, username, wait, ip):
+def main(stdscr, username, ip):
     global b
-    initializeGame(wait, ip, username)
     signal.signal(signal.SIGTERM, receive_sig)
     signal.signal(signal.SIGINT, receive_sig)
     curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLUE)
@@ -152,13 +159,8 @@ def main(stdscr, username, wait, ip):
         fishThread.join()
 
 if __name__ == "__main__":
-    global board
     ip = parseArgs(sys.argv)
-    username = raw_input("Please choose your username: ")
-    while username in board.getPlayers():
-        username = raw_input("Username already taken. Choose another: ")
-    username = re.sub(r'[^a-zA-Z]', '', username)
-    wait = raw_input("Wait for more players? (y?): ")
-    wrapper(main, username, wait, ip)
+    username = initializeGame(ip)
+    wrapper(main, username, ip)
 
 
