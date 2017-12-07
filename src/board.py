@@ -11,8 +11,8 @@ class Board(object):
         self.started = False
         self.playerCount = 0
         self.wave = 1
-        self.height = 30
-        self.width = 100
+        self.height = 40
+        self.width = 170
         self.sharkChars = ["'", '`', ')', '(', '-', ',', '/', '.', '0', ';', '|', '_', '~']
         for j in range(self.height):
             string = ['+']

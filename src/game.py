@@ -35,7 +35,10 @@ class SharkManager(threading.Thread):
         self.numSharks = numSharks
         self.sharks = []
         for i in range(self.numSharks):
-            self.sharks.append(Shark("models/shark.txt", random.randint(1, 28), -55))
+            if i == 0:
+                self.sharks.append(Shark("models/shark.txt", 13, -55))
+            else:
+                self.sharks.append(Shark("models/shark.txt", 1, -55))
 
     def run(self):
         sharksInfo = []
@@ -51,7 +54,7 @@ class SharkManager(threading.Thread):
             lastTime = currTime
 
             counter += delta.microseconds
-            if counter >= 1000000/20:
+            if counter >= 1000000/30:
                 counter = 0
                 board.clearBoard()
                 sharksInfo = []
@@ -92,6 +95,7 @@ def main(argv):
 
     print ("Running server on " + IP + "...let the games begin!")
     prevPlayers = board.numPlayers()
+    global running
     while running:
         currPlayers = board.numPlayers()
         if currPlayers > prevPlayers:
