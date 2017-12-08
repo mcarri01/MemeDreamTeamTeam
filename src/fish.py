@@ -38,6 +38,9 @@ class Fish(object):
     def setDisplayName(self, newName):
         self.displayName = newName
 
+    def getFishName(self):
+        return self.name
+
     def getCol(self):
         return self.col
 
