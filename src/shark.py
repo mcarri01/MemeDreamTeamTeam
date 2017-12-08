@@ -2,6 +2,8 @@ import os
 import sys
 import random
 
+# Holds full representation of shark, including position, height, width,
+# vertical and horizontal velocities, and ascii representation.
 class Shark(object):
     def __init__(self, filename, startrow, startcol):
         self.shark = []
@@ -13,17 +15,19 @@ class Shark(object):
             for line in f:
                 tmp = line.split('\n')[0]
                 tmp = list(tmp.encode("ascii"))
-                self.shark.append(tmp)
+                self.shark.append(tmp)       
 
-    def readShark(self):
-        return self.shark        
-
+# updates location depending on horizontal and vertical velocities.
     def move(self, board):
         self.col += self.horizMove
         self.row += self.vertMove
 
         self.row %= (board.getHeight() - 1)
 
+
+########### GETTERS AND SETTERS ###########
+    def readShark(self):
+        return self.shark 
 
     def getCol(self):
         return self.col

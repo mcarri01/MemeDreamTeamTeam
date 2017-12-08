@@ -1,8 +1,9 @@
+# Holds full representation of fish, including position, height, width,
+# username, and ascii representation.
 class Fish(object):
     def __init__(self, filename, startrow, startcol, username):
         self.fish = []
         self.name = username
-        print len(username)
         self.displayName = username
         self.height = 1
         self.width = 3
@@ -14,6 +15,7 @@ class Fish(object):
                 tmp = list(tmp.encode("ascii"))
                 self.fish.append(tmp)
 
+########### GETTERS AND SETTERS ###########
     def getName(self):
         return self.name
 

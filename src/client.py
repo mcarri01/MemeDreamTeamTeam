@@ -28,61 +28,61 @@ board = []
 dead = False
 
 class DisplayThread(threading.Thread):
-    """ The DisplayThread class handles displaying the current game status
-        to the user. It derives its methods from Python's threading.Thread
-        object, allowing it to run as a thread but giving flexibility with
-        class specific variables and state.
+  """ The DisplayThread class handles displaying the current game status
+      to the user. It derives its methods from Python's threading.Thread
+      object, allowing it to run as a thread but giving flexibility with
+      class specific variables and state.
 
+  """
+
+  def __init__(self, stdscr, username):
+    """ Initializes display parameters, especially the shutdown_flag
+        to check for exit signals from the user.
     """
+    threading.Thread.__init__(self)
 
-    def __init__(self, stdscr, username):
-      """ Initializes display parameters, especially the shutdown_flag
-          to check for exit signals from the user.
-      """
-      threading.Thread.__init__(self)
+    self.user = username
+    self.shutdown_flag = threading.Event()
+    self.stdscr = stdscr
+    self.titleText = ''.join(open("models/title.txt").readlines())
+    self.titleText = self.titleText.strip('\r')
 
-      self.user = username
-      self.shutdown_flag = threading.Event()
-      self.stdscr = stdscr
-      self.titleText = ''.join(open("models/title.txt").readlines())
-      self.titleText = self.titleText.strip('\r')
+  def run(self):
+    """ Main thread exec function. Loops until the user exits with a 
+        SIGINT or SIGTERM.
 
-    def run(self):
-      """ Main thread exec function. Loops until the user exits with a 
-          SIGINT or SIGTERM.
-
-          Utilizes Python curses to handle effective terminal output, 
-          printing out the current board from the Pyro remote object,
-          and then other specific strings indicating game status.
-      """
-      global board
-      lastTime = datetime.now()
-      counter = 0
-      while not self.shutdown_flag.is_set():
-          currTime = datetime.now()
-          delta = currTime - lastTime
-          lastTime = currTime
-          counter += delta.microseconds
-          b = board.readBoard()
-          wave = board.getWave()
-          string = ''
-          for line in b:
-              for c in line:
-                  string += c
-              string += '\n'
-          self.stdscr.addstr(string, curses.color_pair(1))
-          players = board.getPlayers()
-          if not board.gameStarted():
-              board.clearBoard()
-              self.stdscr.addstr("Waiting for players...\n")
-          elif self.user not in players:
-              self.stdscr.addstr("Game Over...you died!\n")
-          else:
-              s = "Current wave: " + str(wave) + ", Players alive: " + \
-                                              " ".join(players) + "\n"
-              self.stdscr.addstr(s, curses.A_BOLD)
-          self.stdscr.addstr(titleString)
-          self.stdscr.move(0, 0)
+        Utilizes Python curses to handle effective terminal output, 
+        printing out the current board from the Pyro remote object,
+        and then other specific strings indicating game status.
+    """
+    global board
+    lastTime = datetime.now()
+    counter = 0
+    while not self.shutdown_flag.is_set():
+        currTime = datetime.now()
+        delta = currTime - lastTime
+        lastTime = currTime
+        counter += delta.microseconds
+        b = board.readBoard()
+        wave = board.getWave()
+        string = ''
+        for line in b:
+            for c in line:
+                string += c
+            string += '\n'
+        self.stdscr.addstr(string, curses.color_pair(1))
+        players = board.getPlayers()
+        if not board.gameStarted():
+            board.clearBoard()
+            self.stdscr.addstr("Waiting for players...\n")
+        elif self.user not in players:
+            self.stdscr.addstr("Game Over...you died!\n")
+        else:
+            s = "Current wave: " + str(wave) + ", Players alive: " + \
+                                            " ".join(players) + "\n"
+            self.stdscr.addstr(s, curses.A_BOLD)
+        self.stdscr.addstr(titleString)
+        self.stdscr.move(0, 0)
 
 class FishThread(threading.Thread):
   """ The FishThread class manages receiving user input and updating 
