@@ -119,6 +119,9 @@ def main(argv):
         elif currPlayers < prevPlayers:
             print ("Player has died!")
             prevPlayers = currPlayers
+        	if currPlayers == 0:
+        		running = False
+        		time.sleep(7)
         if board.gameStarted():
             wave = board.getWave()
             sharkManager = SharkManager(wave)
