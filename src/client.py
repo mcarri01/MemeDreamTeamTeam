@@ -233,6 +233,7 @@ def main(stdscr, username, ip):
   board.clientDisconnected()
 
 if __name__ == "__main__":
+  sys.stdout.write("\x1b[8;{rows};{cols}t".format(rows=60, cols=200))
   ip = parseArgs(sys.argv)
   username = initializeGame(ip)
   wrapper(main, username, ip)
