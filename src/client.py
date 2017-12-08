@@ -44,8 +44,6 @@ class DisplayThread(threading.Thread):
     self.user = username
     self.shutdown_flag = threading.Event()
     self.stdscr = stdscr
-    self.titleText = ''.join(open("models/title.txt").readlines())
-    self.titleText = self.titleText.strip('\r')
 
   def run(self):
     """ Main thread exec function. Loops until the user exits with a 
