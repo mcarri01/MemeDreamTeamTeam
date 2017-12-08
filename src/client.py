@@ -56,11 +56,13 @@ class DisplayThread(threading.Thread):
     global board
     lastTime = datetime.now()
     counter = 0
+    # until clean exit
     while not self.shutdown_flag.is_set():
-        currTime = datetime.now()
-        delta = currTime - lastTime
-        lastTime = currTime
-        counter += delta.microseconds
+        # currTime = datetime.now()
+        # delta = currTime - lastTime
+        # lastTime = currTime
+        # counter += delta.microseconds
+        # draw current board
         b = board.readBoard()
         wave = board.getWave()
         string = ''
@@ -70,15 +72,17 @@ class DisplayThread(threading.Thread):
             string += '\n'
         self.stdscr.addstr(string, curses.color_pair(1))
         players = board.getPlayers()
+        # if in a lobby
         if not board.gameStarted():
-            board.clearBoard()
-            self.stdscr.addstr("Waiting for players...\n")
+          board.clearBoard()
+          self.stdscr.addstr("Waiting for players...\n")
+        # if the player dies
         elif self.user not in players:
-            self.stdscr.addstr("Game Over...you died!\n")
+          self.stdscr.addstr("Game Over...you died!\n")
         else:
-            s = "Current wave: " + str(wave) + ", Players alive: " + \
+          s = "Current wave: " + str(wave) + ", Players alive: " + \
                                             " ".join(players) + "\n"
-            self.stdscr.addstr(s, curses.A_BOLD)
+          self.stdscr.addstr(s, curses.A_BOLD)
         self.stdscr.addstr(titleString)
         self.stdscr.move(0, 0)
 
@@ -108,37 +112,38 @@ class FishThread(threading.Thread):
     """
     global board
     global dead
-    # maybe fix bounds
     fish = Fish("models/fish.txt", 15, 75, self.username)
     while not self.shutdown_flag.is_set():
-        key = self.stdscr.getch()
-        curses.flushinp
-        currCol = fish.getCol()
-        currRow = fish.getRow()
-        if not dead:
-          boardWidth = board.getWidth()
-          boardHeight = board.getHeight()
-          fishWidth = fish.getFishWidth()
-          fishHeight = fish.getFishHeight()
-
-          if key == ord('w') and currRow != 1:
-              fish.setRow(currRow - 1)
-          elif key == ord('d') and currCol != boardWidth-fishWidth:
-              diff = boardWidth-currCol-1
-              if fish.getDisplayNameLen() > diff:
-                  fish.setDisplayName(fish.getDisplayName()[:diff])
-              fish.setCol(currCol + 1)
-          elif key == ord('s') and currRow != boardHeight-fishHeight-2:
-              fish.setRow(currRow + 1)
-          elif key == ord('a') and currCol != 1:
-              if fish.getDisplayNameLen() < fish.getNameLen():
-                  fish.oneMoreChar()
-              fish.setCol(currCol - 1)
-          collision = board.writeBoardFish(fish.getRow(), fish.getCol(), \
-                                       fish.getFish(), fish.getDisplayName())
-          if collision:
-              dead = True
-              board.decrementPlayer(self.username)
+      # gets key press from user
+      key = self.stdscr.getch()
+      curses.flushinp
+      currCol = fish.getCol()
+      currRow = fish.getRow()
+      if not dead:
+        boardWidth = board.getWidth()
+        boardHeight = board.getHeight()
+        fishWidth = fish.getFishWidth()
+        fishHeight = fish.getFishHeight()
+        # depending on direction moves fish
+        if key == ord('w') and currRow != 1:
+            fish.setRow(currRow - 1)
+        elif key == ord('d') and currCol != boardWidth-fishWidth:
+            diff = boardWidth-currCol-1
+            if fish.getDisplayNameLen() > diff:
+                fish.setDisplayName(fish.getDisplayName()[:diff])
+            fish.setCol(currCol + 1)
+        elif key == ord('s') and currRow != boardHeight-fishHeight-2:
+            fish.setRow(currRow + 1)
+        elif key == ord('a') and currCol != 1:
+            if fish.getDisplayNameLen() < fish.getNameLen():
+                fish.oneMoreChar()
+            fish.setCol(currCol - 1)
+        # checks if there was collision on write 
+        collision = board.writeBoardFish(fish.getRow(), fish.getCol(), \
+                                     fish.getFish(), fish.getDisplayName())
+        if collision:
+            dead = True
+            board.decrementPlayer(self.username)
 
 class ServiceExit(Exception):
   """ Custom exception to safely end threads before exitting """
@@ -157,18 +162,23 @@ def initializeGame(ip):
 
       Retrieves username and game mode the user wishes to play.
   """
+
+  # locate nameserver
   NS = Pyro4.locateNS(host=ip, port=9090, broadcast=True)
 
   uri = NS.lookup("example.board")
   global board
+  # retrieve board object
   board = Pyro4.Proxy(uri)
   username = raw_input("Please choose your username: ")
   username = re.sub(r'[^a-zA-Z]', '', username)
+  # only allow unique usernames
   while username in board.getPlayers():
       username = raw_input("Username already taken. Choose another: ")
       username = re.sub(r'[^a-zA-Z]', '', username)
   board.addPlayer(username)
   waiting = raw_input("Wait for more players? (y?): ")
+  # check if we need to put player in a lobby or not
   if waiting != 'y':
       board.startGame()
   elif board.numPlayers() > 1:
@@ -189,7 +199,7 @@ def main(stdscr, username, ip):
   """ Main for client, initializing signal handlers and launching threads.
       Waits for signal to begin shutdown process.
   """
-  global b
+  # signal handlers for clean exit  
   signal.signal(signal.SIGTERM, receive_sig)
   signal.signal(signal.SIGINT, receive_sig)
   curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLUE)
@@ -198,20 +208,22 @@ def main(stdscr, username, ip):
   dispThread = DisplayThread(stdscr, username)
   fishThread = FishThread(stdscr, username)
   b = board.readBoard()
+
+  # until signal exit just start threads and loop
   try:
-      dispThread.start()
-      fishThread.start()
-      while True:
-          time.sleep(0.5)
+    dispThread.start()
+    fishThread.start()
+    while True:
+        time.sleep(0.5)
 
   except ServiceExit:
-
-      dispThread.shutdown_flag.set()
-      fishThread.shutdown_flag.set()
-      if username in board.getPlayers():
-          board.decrementPlayer(username)
-      dispThread.join()
-      fishThread.join()
+    # set flags for threads to clean up and finish
+    dispThread.shutdown_flag.set()
+    fishThread.shutdown_flag.set()
+    if username in board.getPlayers():
+        board.decrementPlayer(username)
+    dispThread.join()
+    fishThread.join()
 
 if __name__ == "__main__":
   ip = parseArgs(sys.argv)

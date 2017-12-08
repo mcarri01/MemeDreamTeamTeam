@@ -29,14 +29,14 @@ class Board(object):
       self.sharkChars = ["'", '`', ')', '(', '-', ',', '/',
                            '.', '0', ';', '|', '_', '~']
       for j in range(self.height):
-          string = ['+']
-          for i in range(self.width-1):
-              if j != 0 and j != (self.height - 1):
-                  string.append(' ')
-              else:
-                  string.append('-')
-          string.append('+')
-          self.board.append(string)
+        string = ['+']
+        for i in range(self.width-1):
+          if j != 0 and j != (self.height - 1):
+            string.append(' ')
+          else:
+            string.append('-')
+        string.append('+')
+        self.board.append(string)
 
   def clearBoard(self):
     """ Removes all characters from the board """
@@ -61,6 +61,7 @@ class Board(object):
         write call to help performance.
 
     """
+    # Keeps list of which sharks have made it offscreen
     finished = []
     for s in sharksInfo:
         row = s['row']
@@ -70,46 +71,46 @@ class Board(object):
         height = 9
         width = 55
         shark = s['shark']
+        # once a shark is offscreen
         if col > self.width + 1:    
-            finished.append(True)
-            continue
+          finished.append(True)
+          continue
         if row == 0:
-            if vertMove < 0:
-                row = self.height - 2
-            else:
-                row += 1
+          if vertMove < 0:
+              row = self.height - 2
+          else:
+              row += 1
         if row < 0:
-            row %= (self.height - 1)
+          row %= (self.height - 1)
 
         tmprow = int(row)
 
         for line in shark:
 
-            if tmprow == 0:
-                tmprow += 1
-                continue
-            elif tmprow < 1:
-                tmprow += 1
-                continue
-            if tmprow >= self.height - 1:
-                tmprow = 1
-
-            tmpcol = int(col)
-
-            for c in line:
-                if tmpcol > (self.width - 1):
-                    tmpcol += 1
-                    continue
-                elif tmpcol < 0:
-                    tmpcol += 1
-                    continue
-
-                if tmpcol == 0:
-                    tmpcol += 1
-                if c != ' ':
-                    self.board[tmprow][tmpcol] = c
-                tmpcol += 1
+          if tmprow == 0:
             tmprow += 1
+            continue
+          elif tmprow < 1:
+            tmprow += 1
+            continue
+          if tmprow >= self.height - 1:
+            tmprow = 1
+
+          tmpcol = int(col)
+
+          for c in line:
+            if tmpcol > (self.width - 1):
+              tmpcol += 1
+              continue
+            elif tmpcol < 0:
+              tmpcol += 1
+              continue
+            if tmpcol == 0:
+              tmpcol += 1
+            if c != ' ':
+              self.board[tmprow][tmpcol] = c
+            tmpcol += 1
+          tmprow += 1
         finished.append(False)
     return finished
 
@@ -130,14 +131,15 @@ class Board(object):
 
     tmprow = int(row) + 1
     for line in fish:
-        tmpcol = int(col)
-        for c in line:
-            if self.board[tmprow][tmpcol] in self.sharkChars:
-                return True
-            else:
-                self.board[tmprow][tmpcol] = c
-            tmpcol += 1
-        tmprow += 1
+      tmpcol = int(col)
+      for c in line:
+        # If a fish tries to overwrite a shark, collision
+        if self.board[tmprow][tmpcol] in self.sharkChars:
+          return True
+        else:
+          self.board[tmprow][tmpcol] = c
+        tmpcol += 1
+      tmprow += 1
     return False
       
   def getHeight(self):
