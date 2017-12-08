@@ -26,6 +26,7 @@ import argparse
 
 board = []
 dead = False
+running = True
 
 class DisplayThread(threading.Thread):
   """ The DisplayThread class handles displaying the current game status
@@ -57,39 +58,34 @@ class DisplayThread(threading.Thread):
     lastTime = datetime.now()
     counter = 0
     # until clean exit
-    while not self.shutdown_flag.is_set():
-        # currTime = datetime.now()
-        # delta = currTime - lastTime
-        # lastTime = currTime
-        # counter += delta.microseconds
-        # draw current board
-        if 
-        b = board.readBoard()
-        wave = board.getWave()
-        string = ''
-        for line in b:
-            for c in line:
-                string += c
-            string += '\n'
-        self.stdscr.addstr(string, curses.color_pair(1))
-        players = board.getPlayers()
-        # if in a lobby
-        if not board.gameStarted():
-          board.clearBoard()
-          self.stdscr.addstr("Waiting for players...\n")
-        # if the player dies
-        elif self.user not in players:
-          self.stdscr.addstr("Game Over...you died!\n")
-          if board.numPlayers() == 0:
-            print "Game ended, thanks for playing!"
-            raise ServiceExit
-            time.sleep(3)
+    while not self.shutdown_flag.is_set() and running:
+      # draw current board
+      b = board.readBoard()
+      wave = board.getWave()
+      string = ''
+      for line in b:
+          for c in line:
+              string += c
+          string += '\n'
+      self.stdscr.addstr(string, curses.color_pair(1))
+      players = board.getPlayers()
+      # if in a lobby
+      if not board.gameStarted():
+        board.clearBoard()
+        self.stdscr.addstr("Waiting for players...\n")
+      # if the player dies
+      elif self.user not in players:
+        if board.numPlayers() == 0:
+          self.stdscr.addstr("Game ended, thanks for playing!\n",curses.A_BOLD)
+          threading.Timer(5, endGame).start()
         else:
-          s = "Current wave: " + str(wave) + ", Players alive: " + \
-                                            " ".join(players) + "\n"
-          self.stdscr.addstr(s, curses.A_BOLD)
-        self.stdscr.addstr(titleString)
-        self.stdscr.move(0, 0)
+          self.stdscr.addstr("Game Over...you died!\n", curses.A_BOLD)
+      else:
+        s = "Current wave: " + str(wave) + ", Players alive: " + \
+                                          " ".join(players) + "\n"
+        self.stdscr.addstr(s, curses.A_BOLD)
+      self.stdscr.addstr(titleString)
+      self.stdscr.move(0, 0)
 
 class FishThread(threading.Thread):
   """ The FishThread class manages receiving user input and updating 
@@ -118,7 +114,7 @@ class FishThread(threading.Thread):
     global board
     global dead
     fish = Fish("models/fish.txt", 15, 75, self.username)
-    while not self.shutdown_flag.is_set():
+    while not self.shutdown_flag.is_set() and running:
       # gets key press from user
       key = self.stdscr.getch()
       curses.flushinp
@@ -160,6 +156,9 @@ def receive_sig(signum, stack):
   """
   raise ServiceExit
 
+def endGame():
+  global running
+  running = False
 
 def initializeGame(ip):
   """ Initializes the game by connecting to the nameserver and retrieving
@@ -181,6 +180,7 @@ def initializeGame(ip):
   while username in board.getPlayers():
       username = raw_input("Username already taken. Choose another: ")
       username = re.sub(r'[^a-zA-Z]', '', username)
+  board.clientConnected()
   board.addPlayer(username)
   waiting = raw_input("Wait for more players? (y?): ")
   # check if we need to put player in a lobby or not
@@ -218,7 +218,7 @@ def main(stdscr, username, ip):
   try:
     dispThread.start()
     fishThread.start()
-    while True:
+    while running:
         time.sleep(0.5)
 
   except ServiceExit:
@@ -229,6 +229,8 @@ def main(stdscr, username, ip):
         board.decrementPlayer(username)
     dispThread.join()
     fishThread.join()
+
+  board.clientDisconnected()
 
 if __name__ == "__main__":
   ip = parseArgs(sys.argv)

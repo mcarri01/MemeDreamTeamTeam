@@ -28,7 +28,7 @@ class SharkManager(threading.Thread):
         self.sharks = []
         for i in range(self.numSharks):
             self.sharks.append(Shark("models/shark.txt",\
-            						 random.randint(1, 28), -55))
+                                     random.randint(1, 28), -55))
 
     def run(self):
         sharksInfo = []
@@ -37,8 +37,8 @@ class SharkManager(threading.Thread):
         counter = 0
 
         # Sharks run until off screen (as long as game is continuing)
-        while not offScreen and running:
-        	# Buffered fps
+        while not offScreen and board.numPlayers() > 0:
+            # Buffered fps
             currTime = datetime.now()
             delta = currTime - lastTime
             lastTime = currTime
@@ -51,9 +51,9 @@ class SharkManager(threading.Thread):
                 sharksInfo = []
                 for s in self.sharks:
                     sharksInfo.append({'row': s.row, 'col': s.col,\
-                    				   'vertMove': s.vertMove,\
-                    				   'horizMove': s.horizMove,\
-                    				   'shark': s.shark})
+                                       'vertMove': s.vertMove,\
+                                       'horizMove': s.horizMove,\
+                                       'shark': s.shark})
                 status = board.writeBoardShark(sharksInfo)
 
                 # Checks if all sharks are off screen
@@ -84,7 +84,7 @@ def endserver(signum, stack):
 # are spawned from within a while loop that continues until receiving
 # the Ctrl-C signal.
 def main(argv):
-	# Retrieve the host's currennt IP.
+    # Retrieve the host's currennt IP.
     signal.signal(signal.SIGINT, endserver)
     processesStart = []
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -111,6 +111,7 @@ def main(argv):
 
     # Loop which controls game.  Spawns sharks (as many as the wave value),
     # Only starts sharks spawning once a player has entered the game.
+    global running
     while running:
         currPlayers = board.numPlayers()
         if currPlayers > prevPlayers:
@@ -119,9 +120,11 @@ def main(argv):
         elif currPlayers < prevPlayers:
             print ("Player has died!")
             prevPlayers = currPlayers
-        	if currPlayers == 0:
-        		running = False
-        		time.sleep(7)
+            if currPlayers == 0:
+                print "Game has ended...closing server"
+                running = False
+                while board.numClients() != 0:
+                    time.sleep(1)
         if board.gameStarted():
             wave = board.getWave()
             sharkManager = SharkManager(wave)

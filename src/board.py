@@ -23,6 +23,7 @@ class Board(object):
       self.playerList = []
       self.started = False
       self.playerCount = 0
+      self.clientNum = 0
       self.wave = 1
       self.height = 40
       self.width = 170
@@ -153,6 +154,15 @@ class Board(object):
   def numPlayers(self):
     """ Returns the current number of players in the game """
     return self.playerCount
+
+  def clientConnected(self):
+    self.clientNum += 1
+
+  def clientDisconnected(self):
+    self.clientNum -= 1
+
+  def numClients(self):
+    return self.clientNum
 
   def addPlayer(self, name):
     """ Adds a player and their username to the game """
