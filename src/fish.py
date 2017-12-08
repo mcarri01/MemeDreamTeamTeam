@@ -1,6 +1,10 @@
 # Holds full representation of fish, including position, height, width,
 # username, and ascii representation.
 class Fish(object):
+    """ The Fish class contains all necessary information for a fish,
+        including dimensions of the model, username, and current
+        position.
+    """
     def __init__(self, filename, startrow, startcol, username):
         self.fish = []
         self.name = username

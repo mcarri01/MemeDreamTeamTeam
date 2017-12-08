@@ -63,6 +63,7 @@ class DisplayThread(threading.Thread):
         # lastTime = currTime
         # counter += delta.microseconds
         # draw current board
+        if 
         b = board.readBoard()
         wave = board.getWave()
         string = ''
@@ -79,6 +80,10 @@ class DisplayThread(threading.Thread):
         # if the player dies
         elif self.user not in players:
           self.stdscr.addstr("Game Over...you died!\n")
+          if board.numPlayers() == 0:
+            print "Game ended, thanks for playing!"
+            raise ServiceExit
+            time.sleep(3)
         else:
           s = "Current wave: " + str(wave) + ", Players alive: " + \
                                             " ".join(players) + "\n"
