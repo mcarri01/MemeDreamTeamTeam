@@ -57,7 +57,13 @@ In src/:
 			   threads, one to handle user input and controlling their fish
 			   object (obtained through fish.py), and the other to keep a clear
 			   display (with the help of the curses library). 
-	board.py: 
+	board.py: Contains our Pyro class object. It is the centerpiece of our game,
+			  containing all information regarding the current game state
+			  (the board itself, whether the game has started, the number
+			  of players/their usernames, etc.) and with methods to update
+			  the game information and board through read & write operations.
+			  It is made accessible to both the server and client programs
+			  throughout the game.
 
 Any other files include the ascii models for both the sharks and minnows, and our ascii art title string which we just decided to include as a python file containing a longstring for simplicity. 
 
