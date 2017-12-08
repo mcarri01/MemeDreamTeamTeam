@@ -126,7 +126,9 @@ class FishThread(threading.Thread):
         fishWidth = fish.getFishWidth()
         fishHeight = fish.getFishHeight()
         # depending on direction moves fish
-        if key == ord('w') and currRow != 1:
+        if key == ord('w') and currRow:# != 1:
+            if currRow == 1:
+              fish.setDisplayName("")
             fish.setRow(currRow - 1)
         elif key == ord('d') and currCol != boardWidth-fishWidth:
             diff = boardWidth-currCol-1
@@ -134,9 +136,14 @@ class FishThread(threading.Thread):
                 fish.setDisplayName(fish.getDisplayName()[:diff])
             fish.setCol(currCol + 1)
         elif key == ord('s') and currRow != boardHeight-fishHeight-2:
+            if currRow == 0:
+                if fish.getDisplayNameLen() == 0:
+                    diff = boardWidth-currCol  
+                    fish.setDisplayName(fish.getName()[:diff])
             fish.setRow(currRow + 1)
         elif key == ord('a') and currCol != 1:
-            if fish.getDisplayNameLen() < fish.getNameLen():
+            if fish.getDisplayNameLen() < fish.getNameLen() and \
+               fish.getDisplayNameLen() != 0:
                 fish.oneMoreChar()
             fish.setCol(currCol - 1)
         # checks if there was collision on write 
@@ -193,7 +200,8 @@ def initializeGame(ip):
 def parseArgs(argv):
   """ Parses IP command line argument """
   parser = argparse.ArgumentParser(description='Client program \
-                                                for SharksAndMinnows game!')
+                                                for SharksAndMinnows game! \
+                                                Use W-A-S-D for Fish controls')
   parser.add_argument('-i', dest='ip', type=str,
                       help='IPv4 Address of Name Server')
 
