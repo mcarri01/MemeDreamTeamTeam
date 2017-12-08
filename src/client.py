@@ -200,7 +200,8 @@ def initializeGame(ip):
 def parseArgs(argv):
   """ Parses IP command line argument """
   parser = argparse.ArgumentParser(description='Client program \
-                                                for SharksAndMinnows game!')
+                                                for SharksAndMinnows game! \
+                                                Use W-A-S-D for Fish controls')
   parser.add_argument('-i', dest='ip', type=str,
                       help='IPv4 Address of Name Server')
 
@@ -240,6 +241,7 @@ def main(stdscr, username, ip):
   board.clientDisconnected()
 
 if __name__ == "__main__":
+  sys.stdout.write("\x1b[8;{rows};{cols}t".format(rows=60, cols=200))
   ip = parseArgs(sys.argv)
   username = initializeGame(ip)
   wrapper(main, username, ip)
