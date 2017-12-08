@@ -193,7 +193,8 @@ def initializeGame(ip):
 def parseArgs(argv):
   """ Parses IP command line argument """
   parser = argparse.ArgumentParser(description='Client program \
-                                                for SharksAndMinnows game!')
+                                                for SharksAndMinnows game! \
+                                                Use W-A-S-D for Fish controls')
   parser.add_argument('-i', dest='ip', type=str,
                       help='IPv4 Address of Name Server')
 
