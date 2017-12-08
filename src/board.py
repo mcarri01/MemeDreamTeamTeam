@@ -11,8 +11,8 @@ class Board(object):
         self.started = False
         self.playerCount = 0
         self.wave = 1
-        self.height = 30
-        self.width = 100
+        self.height = 40
+        self.width = 170
         self.sharkChars = ["'", '`', ')', '(', '-', ',', '/', '.', '0', ';', '|', '_', '~']
         for j in range(self.height):
             string = ['+']
@@ -34,6 +34,7 @@ class Board(object):
         
 
     def writeBoardShark(self, sharksInfo):
+        finished = []
         for s in sharksInfo:
             row = s['row']
             col = s['col']  
@@ -42,7 +43,6 @@ class Board(object):
             height = 9
             width = 55
             shark = s['shark']
-            finished = []
             if col > self.width + 1:    
                 finished.append(True)
                 continue
