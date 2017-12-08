@@ -34,6 +34,7 @@ class Board(object):
         
 
     def writeBoardShark(self, sharksInfo):
+        finished = []
         for s in sharksInfo:
             row = s['row']
             col = s['col']  
@@ -42,7 +43,6 @@ class Board(object):
             height = 9
             width = 55
             shark = s['shark']
-            finished = []
             if col > self.width + 1:    
                 finished.append(True)
                 continue

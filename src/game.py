@@ -35,10 +35,7 @@ class SharkManager(threading.Thread):
         self.numSharks = numSharks
         self.sharks = []
         for i in range(self.numSharks):
-            if i == 0:
-                self.sharks.append(Shark("models/shark.txt", 13, -55))
-            else:
-                self.sharks.append(Shark("models/shark.txt", 1, -55))
+            self.sharks.append(Shark("models/shark.txt", random.uniform(0,35), -55))
 
     def run(self):
         sharksInfo = []
@@ -54,7 +51,7 @@ class SharkManager(threading.Thread):
             lastTime = currTime
 
             counter += delta.microseconds
-            if counter >= 1000000/30:
+            if counter >= 1000000/10:
                 counter = 0
                 board.clearBoard()
                 sharksInfo = []

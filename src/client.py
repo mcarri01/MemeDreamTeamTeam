@@ -36,27 +36,27 @@ class DisplayThread(threading.Thread):
             delta = currTime - lastTime
             lastTime = currTime
             counter += delta.microseconds
-        #if counter >= 1000000/20:
-        #    counter = 0
-            b = board.readBoard()
-            wave = board.getWave()
-            string = ''
-            for line in b:
-                for c in line:
-                    string += c
-                string += '\n'
-            self.stdscr.addstr(string, curses.color_pair(1))
-            players = board.getPlayers()
-            if not board.gameStarted():
-                board.clearBoard()
-                self.stdscr.addstr("Waiting for players...\n")
-            elif self.user not in players:
-                self.stdscr.addstr("Game Over...you died!\n")
-            else:
-                s = "Current wave: " + str(wave) + ", Players alive: " + " ".join(players) + "\n"
-                self.stdscr.addstr(s, curses.A_BOLD)
-            self.stdscr.addstr(titleString)
-            self.stdscr.move(0, 0)
+            if counter >= 1000000/20:
+                counter = 0
+                b = board.readBoard()
+                wave = board.getWave()
+                string = ''
+                for line in b:
+                    for c in line:
+                        string += c
+                    string += '\n'
+                self.stdscr.addstr(string, curses.color_pair(1))
+                players = board.getPlayers()
+                if not board.gameStarted():
+                    board.clearBoard()
+                    self.stdscr.addstr("Waiting for players...\n")
+                elif self.user not in players:
+                    self.stdscr.addstr("Game Over...you died!\n")
+                else:
+                    s = "Current wave: " + str(wave) + ", Players alive: " + " ".join(players) + "\n"
+                    self.stdscr.addstr(s, curses.A_BOLD)
+                self.stdscr.addstr(titleString)
+                self.stdscr.move(0, 0)
 
 class FishThread(threading.Thread):
 
