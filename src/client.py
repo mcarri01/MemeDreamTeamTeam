@@ -181,21 +181,25 @@ def initializeGame(ip):
   global board
   # retrieve board object
   board = Pyro4.Proxy(uri)
-  username = raw_input("Please choose your username: ")
-  username = re.sub(r'[^a-zA-Z]', '', username)
-  # only allow unique usernames
-  while username in board.getPlayers():
-      username = raw_input("Username already taken. Choose another: ")
-      username = re.sub(r'[^a-zA-Z]', '', username)
-  board.clientConnected()
-  board.addPlayer(username)
-  waiting = raw_input("Wait for more players? (y?): ")
-  # check if we need to put player in a lobby or not
-  if waiting != 'y':
-      board.startGame()
-  elif board.numPlayers() > 1:
-      board.startGame()
-  return username
+  if not board.gameStarted():
+    username = raw_input("Please choose your username: ")
+    username = re.sub(r'[^a-zA-Z]', '', username)
+    # only allow unique usernames
+    while username in board.getPlayers():
+        username = raw_input("Username already taken. Choose another: ")
+        username = re.sub(r'[^a-zA-Z]', '', username)
+    board.clientConnected()
+    board.addPlayer(username)
+    waiting = raw_input("Wait for another player? (y?): ")
+    # check if we need to put player in a lobby or not
+    if waiting != 'y':
+        board.startGame()
+    elif board.numPlayers() > 1:
+        board.startGame()
+    return username
+  else:
+    print "Game has already started, sorry!"
+    exit(1)
 
 def parseArgs(argv):
   """ Parses IP command line argument """
